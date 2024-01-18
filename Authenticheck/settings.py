@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 from dotenv import load_dotenv
+import logging
 import os
 
 load_dotenv()
@@ -30,7 +31,9 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 DEBUG = os.getenv("DEBUG") == 'True'
 
 ALLOWED_HOSTS = []
-
+ADMINS = (
+    ('Lawal Afeez', 'lawalafeez052@gmail.com')
+)
 
 # Application definition
 
@@ -128,6 +131,44 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 EMAIL_BACKEND="django.core.mail.backends.smtp.EmailBackend"
 
+LOG_DIR = BASE_DIR / "logs"
+if not LOG_DIR.exists():
+    LOG_DIR.mkdir(parents=True)
+
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "{levelname} {asctime} {message}",
+            "style": "{",
+        },
+        "simple": {
+            "format": "{levelname} {message}",
+            "style": "{",
+        },
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "verbose"
+        },
+        "core_logfile": {
+            "class": "logging.FileHandler",
+            "formatter": "verbose",
+            "filename": os.path.join(BASE_DIR, "logs/core.log"),
+            "delay": True,  # Add the delay parameter
+        },
+    },
+    "loggers": {
+        "core": {
+            "handlers": ["core_logfile", "console"],
+            "level": "DEBUG",
+            "propagate": True,
+        },
+    }
+}
 
 try:
     from .local_settings import *

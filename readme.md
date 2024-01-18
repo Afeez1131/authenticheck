@@ -4,14 +4,13 @@
 In the latter part of 2023, the Nigerian market experienced an alarming surge in counterfeit products, spanning various categories such as food, beverages, healthcare, and more. Recognizing the severity of this issue, I embarked on a mission to develop a solution that would empower consumers to distinguish between authentic and fake products.
 Identifying the Problem
 
-Counterfeit products pose a significant threat to public health and safety. The need for a reliable and accessible system for product authenticity verification became apparent as unsuspecting consumers continued to fall victim to counterfeit goods. This challenge fueled my determination to create a tool that would provide consumers with instant authenticity verification.
+Counterfeit products pose a significant threat to public health and safety. The need for a reliable and accessible system for product authenticity verification became apparent as unsuspecting consumers continued to fall victim to counterfeit goods. This challenge fueled my determination to create a tool that would provide consumers with instant authenticity detection.
 
 ## Why QR Code?
 
 After thorough consideration of various technological solutions, the QR code emerged as the most practical and efficient method for product authenticity verification. Here's why:
 
 - Ease of Scanning: QR codes are easily scannable using smartphones, making it accessible for a wide range of users.
-
 - Simplicity in Generation: Generating QR codes is a straightforward process, ensuring that businesses can seamlessly incorporate them into their product packaging.
 
 ## How AuthentiCheck Works
@@ -20,7 +19,7 @@ AuthentiCheck, a robust Django web application, is tailored to empower business 
 
 Business Profile Creation: Businesses can establish their profiles within the application, with each owner receiving a unique secret code for heightened security.
 
-Product Management: Business owners can define and manage various products, assigning a unique identifier for each product. Additionally, each product is endowed with a shelf life, a crucial factor used to determine the likely expiry date of each product instance.
+Product Management: Business owners can define and manage various products, assigning a unique identifier for each product. Additionally, each product is given a shelf life, a crucial factor used to determine the likely expiry date of each product instance.
 
 Product Instances: Instances of each product feature manufacturing and expiry dates, providing crucial information for consumers.
 
@@ -51,7 +50,10 @@ Follow these steps to set up and run the application locally:
    ```bash
    python manage.py runserver
    ```
-
+6. Load temp data into the DB by running
+   ```bash
+   python manage.py load_data --count 200 # no of records you want created
+   ```
 6. Open your browser and navigate to [http://localhost:8000](http://localhost:8000) to access the application.
 
 ## Developer
