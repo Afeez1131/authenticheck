@@ -1,4 +1,5 @@
 # AuthentiCheck
+![Authenticheck Flow](https://drive.google.com/file/d/1aBM2IO0QKzrOrdRP25K2bR0-DGgEt5T2/view?usp=sharing)
 ## Introduction
 In the latter part of 2023, the Nigerian market experienced an alarming surge in counterfeit products, spanning various categories such as food, beverages, healthcare, and more. Recognizing the severity of this issue, I embarked on a mission to develop a solution that would empower consumers to distinguish between authentic and fake products.
 Identifying the Problem
