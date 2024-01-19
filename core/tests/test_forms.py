@@ -7,14 +7,15 @@ User = get_user_model()
 
 def create_user(username='temp', password='password'):
     return User.objects.create_user(username=username, password=password)
+def get_business_form_data():
 
-BUSINESS_FORM_DATA = {
+    return {
             "name": "Business Name",
             "description": "About Business",
             "address": "Location",
             "phone": "Business Hotline",
             "website": "Website URL",
-            "email": "Business Email"
+            "email": "email@gmail.com"
         }
 
 class BusinessFormTestCase(TestCase):
@@ -34,14 +35,36 @@ class BusinessFormTestCase(TestCase):
         self.assertNotIn("house", self.form.fields)
         self.assertEqual(len(self.form.fields), 6)
 
+    def test_form_with_empty_data(self):
+        data = {}
+        form = BusinessForm(data)
+        self.assertEqual(len(form.errors), 6)
+        self.assertIn("this field is required", str(form).lower())
+        self.assertFormError(form, "name", "This field is required.")
+        self.assertFormError(form, "description", "This field is required.")
+        self.assertFormError(form, "address", "This field is required.")
+        self.assertFormError(form, "phone", "This field is required.")
+        self.assertFormError(form, "website", "This field is required.")
+        self.assertFormError(form, "email", "This field is required.")
+
+
     def test_form_with_invalid_data(self):
         """
         test that form raises invalid when submitted without all fields
         """
-        data = BUSINESS_FORM_DATA
-        data.pop("email")
+        data = get_business_form_data()
         data.pop('name')
-        form = self.form(data)
-        print('form: ', form)
-        self.assertInHTML('This field is required', str(form))
+        form = BusinessForm(data)
+        self.assertTrue('This field is required.'.lower() in str(form).lower())
+        self.assertFalse('Enter a valid email'.lower() in str(form).lower())
+        self.assertTrue('Enter a valid URL'.lower() in str(form).lower())
+        self.assertFalse(form.is_valid())
 
+    def test_form_with_valid_data(self):
+        """
+        test that form is valid if all fields are provided.
+        """
+        data = get_business_form_data()
+        data.update({"website": "website.com", "email": "email@gmail.com"})
+        form = BusinessForm(data)
+        self.assertTrue(form.is_valid())

@@ -64,7 +64,7 @@ class BusinessModelTestCase(TestCase):
         """
         Test the __str__ method is correct
         """
-        self.assertEqual(self.business.__str__(), "Testing Venture venture@ng.com")
+        self.assertEqual(str(self.business), "Testing Venture venture@ng.com")
 
     def test_no_secret(self):
         """
@@ -108,7 +108,7 @@ class ProductTestCase(TestCase):
         name = "Temp Product"
         short_name = "short_name"
         product = create_product(business=bussiness, name=name, short_name=short_name)
-        self.assertEqual(f"{product.name} - {product.short_name}", f"{name} - {short_name}")
+        self.assertEqual(str(product), f"{name} - ({short_name})")
     
     def test_product_created_successfully(self):
         """
@@ -218,4 +218,4 @@ class ProductInstanceTestCase(TestCase):
         manufactured = timezone.now()
         instance = create_product_instance(product=product, manufactured=manufactured)
         exp = manufactured + timedelta(days=instance.product.shelf_life)
-        self.assertEqual(f"{instance.product.name} - {instance.manufactured.date()} - {instance.expiry_date.date()}", f"{name} - {manufactured.date()} - {exp.date()}")
+        self.assertEqual(str(instance), f"{name} - ({manufactured.date()} - {exp.date()})")
