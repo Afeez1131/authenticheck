@@ -25,7 +25,7 @@ class BusinessForm(forms.ModelForm):
         }
 
 
-class ProductForms(forms.ModelForm):
+class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
         fields = ["name", "description", "price", "shelf_life", "category"]

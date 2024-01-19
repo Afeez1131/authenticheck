@@ -32,9 +32,10 @@ DEBUG = os.getenv("DEBUG") == 'True'
 
 ALLOWED_HOSTS = []
 ADMINS = (
-    ('Lawal Afeez', 'lawalafeez052@gmail.com')
+    ('Lawal Afeez', 'lawalafeez052@gmail.com'),
 )
 
+MANAGERS = ADMINS
 # Application definition
 
 INSTALLED_APPS = [
@@ -134,14 +135,19 @@ EMAIL_BACKEND="django.core.mail.backends.smtp.EmailBackend"
 LOG_DIR = BASE_DIR / "logs"
 if not LOG_DIR.exists():
     LOG_DIR.mkdir(parents=True)
-
+# [%(name)s:%(lineno)s]
 
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
+    "filters": {
+        "require_debug_true": {
+            "()": "django.utils.log.RequireDebugTrue",
+        },
+    },
     "formatters": {
         "verbose": {
-            "format": "{levelname} {asctime} {message}",
+            "format": "{levelname} {asctime} [{name}:{lineno}] {message}",
             "style": "{",
         },
         "simple": {
@@ -160,6 +166,10 @@ LOGGING = {
             "filename": os.path.join(BASE_DIR, "logs/core.log"),
             "delay": True,  # Add the delay parameter
         },
+        "mail_admins": {
+            "level": "ERROR",
+            "class": "django.utils.log.AdminEmailHandler",
+        },
     },
     "loggers": {
         "core": {
@@ -167,6 +177,11 @@ LOGGING = {
             "level": "DEBUG",
             "propagate": True,
         },
+        "django": {
+            "handlers": ["mail_admins"],
+            "level": "ERROR",
+            "propagate": False,
+        }
     }
 }
 
