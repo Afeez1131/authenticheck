@@ -41,8 +41,7 @@ class BusinessFormTestCase(TestCase):
         data = BUSINESS_FORM_DATA
         data.pop("email")
         data.pop('name')
-        self.request.POST = data
-        form = self.form(self.request.POST)
+        form = self.form(data)
         print('form: ', form)
         self.assertInHTML('This field is required', str(form))
 
