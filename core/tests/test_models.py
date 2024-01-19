@@ -98,6 +98,17 @@ class ProductTestCase(TestCase):
         self.user = create_dummy_user(username='testuser1')
         self.business = create_business(user=self.user)
         self.product = create_product(business=self.business)
+
+    def test_str_method(self):
+        """
+        test that the string representation of the model is correct
+        """
+        user = create_dummy_user('temp', 'password')
+        bussiness = create_business(user=user)
+        name = "Temp Product"
+        short_name = "short_name"
+        product = create_product(business=bussiness, name=name, short_name=short_name)
+        self.assertEqual(f"{product.name} - {product.short_name}", f"{name} - {short_name}")
     
     def test_product_created_successfully(self):
         """
@@ -195,3 +206,16 @@ class ProductInstanceTestCase(TestCase):
         """
         message = f"{self.product_instance.expiry_date} is not greater than {self.product_instance.manufactured}"
         self.assertGreater(self.product_instance.expiry_date, self.product_instance.manufactured, message)
+
+    def test_string_respresentation(self):
+        """
+        Test the string representation of the model
+        """
+        user = create_dummy_user('temp', 'password')
+        bussiness = create_business(user=user)
+        name = "Product Name"
+        product = create_product(business=bussiness, name=name)
+        manufactured = timezone.now()
+        instance = create_product_instance(product=product, manufactured=manufactured)
+        exp = manufactured + timedelta(days=instance.product.shelf_life)
+        self.assertEqual(f"{instance.product.name} - {instance.manufactured.date()} - {instance.expiry_date.date()}", f"{name} - {manufactured.date()} - {exp.date()}")
