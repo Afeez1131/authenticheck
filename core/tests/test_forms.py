@@ -199,3 +199,21 @@ class TestProductInstanceForm(TestCase):
         self.assertFalse(form.is_valid())
         self.assertFormError(form, 'product', 'This field is required.')
 
+    def test_model_is_populated_with_instance_data(self):
+        user = create_user(username='world')
+        business = create_business(user=user)
+        product = create_product(business=business, name='Titus2')
+        now = timezone.now()
+        data = {
+            "product": product,
+            "manufactured": now
+        }
+        f = ProductInstanceForm(data)
+        product_instance = f.save()
+        form = ProductInstanceForm(instance=product_instance)
+        self.assertEqual(form['product'].value(), product.id)
+        self.assertAlmostEqual(
+            product_instance.manufactured,
+            now,
+            delta=timezone.timedelta(seconds=1)  # Adjust the delta as needed
+        )
