@@ -1,5 +1,7 @@
 from django import forms
 from .models import Business, Product, ProductInstance
+from django.utils import timezone
+from datetime import timedelta
 
 
 class BusinessForm(forms.ModelForm):
@@ -45,21 +47,21 @@ class ProductForm(forms.ModelForm):
         }
     
     def clean(self):
+        self.cleaned_data = super().clean()
         name = self.cleaned_data.get('name', '')
         price = self.cleaned_data.get('price', '')
         shelf_life = self.cleaned_data.get('shelf_life', '')
-
-        if not self.instance.pk and Product.objects.get(name=name).exists():
-            raise forms.ValidationError({'name': f'Product with name {name} exists.'})
-        try:
-            price = int(price)
-        except ValueError:
-            raise forms.ValidationError({'price': f'Invalid Price {price}'})
-
+        if not self.instance.pk and name and Product.objects.filter(name=name).exists():
+            self.add_error('name', f'Product with name {name} exists.')
         try:
             shelf_life = int(shelf_life)
         except ValueError:
-            raise forms.ValidationError({'price': f'Invalid Shelf Life {shelf_life}'})
+            self.add_error('shelf_life', f'Invalid Shelf Life {shelf_life}')
+        try:
+            price = int(price)
+        except ValueError:
+            self.add_error('price', f'Invalid Price {price}')
+        
         return self.cleaned_data
 
 
@@ -77,7 +79,8 @@ class ProductInstanceForm(forms.ModelForm):
         }
 
     def clean(self):
+        self.cleaned_data = super().clean()
         manufactured = self.cleaned_data.get("manufactured", "")
-        if timezone.now().date() > manufactured.date():
-            raise forms.ValidationError({"manufactured": "Manufactured date cannot be before today."})
+        if manufactured and manufactured.date() != timezone.now().date():
+            self.add_error("manufactured", "Manufactured date should be the same as today.")
         return self.cleaned_data
