@@ -94,6 +94,49 @@ class BusinessFormTestCase(TestCase):
         self.assertEqual(Business.objects.count(), 1)
         self.assertTrue(form.is_valid())
 
+    def test_field_customization(self):
+        """
+        Test that widget customization is effected on the fields
+        """
+        form = BusinessForm()
+        self.assertIn('class="form-control"', str(form['name']))
+        self.assertIn('placeholder="Business Name', str(form['name']))
+
+        self.assertIn('class="form-control"', str(form['description']))
+        self.assertIn('placeholder="Business Description"', str(form['description']))
+
+        self.assertIn('class="form-control"', str(form['address']))
+        self.assertIn('placeholder="Business Address"', str(form['address']))
+
+        self.assertIn('class="form-control"', str(form['phone']))
+        self.assertIn('placeholder="Business Phone"', str(form['phone']))
+
+        self.assertIn('class="form-control"', str(form['website']))
+        self.assertIn('placeholder="Business Website"', str(form['website']))
+
+        self.assertIn('class="form-control"', str(form['email']))
+        self.assertIn('placeholder="Business E-mail"', str(form['email']))
+
+    def test_widget_customization(self):
+        """
+        Test that widget customizations is effected
+        """
+        form = BusinessForm()
+        self.assertEqual('Business Name', form.fields['name'].label)
+        self.assertEqual('form-control', form.fields['name'].widget.attrs['class'])
+
+        self.assertEqual('About Business', form.fields['description'].label)
+        self.assertEqual('form-control', form.fields['description'].widget.attrs['class'])
+
+        self.assertEqual('Location', form.fields['address'].label)
+        self.assertEqual('form-control', form.fields['address'].widget.attrs['class'])
+
+        self.assertEqual('Website URL', form.fields['website'].label)
+        self.assertEqual('form-control', form.fields['website'].widget.attrs['class'])
+        # print(form.fields.get("email").label)
+        self.assertEqual('Business Email', form.fields['email'].label)
+        self.assertEqual('form-control', form.fields['email'].widget.attrs['class'])
+
 
 class ProductFormTestCase(TestCase):
     """
@@ -134,6 +177,42 @@ class ProductFormTestCase(TestCase):
         form.instance.business = business
         form.save()
         self.assertEqual(Product.objects.count(), 1)
+
+    def test_field_customization(self):
+        """
+        Test that widget customization are effected on the fields
+        """
+        form = ProductForm()
+        self.assertIn('class="form-control', str(form['name']))
+        self.assertIn('placeholder="Product Name', str(form['name']))
+
+        self.assertIn('class="form-control"', str(form['description']))
+        self.assertIn('placeholder="Product Description"', str(form['description']))
+
+        self.assertIn('class="form-control"', str(form['price']))
+        self.assertIn('placeholder="Product Price"', str(form['price']))
+
+        self.assertIn('class="form-control"', str(form['shelf_life']))
+        self.assertIn('placeholder="Product Expected Shelf Life"', str(form['shelf_life']))
+
+        self.assertIn('class="form-select"', str(form['category']))
+
+    def test_widget_customization(self):
+        """
+        Test that widget customizations are effected
+        """
+        form = ProductForm()
+        self.assertEqual('Product Name', form.fields['name'].label)
+        self.assertEqual('Product Description', form.fields['description'].label)
+        self.assertEqual('Price of Product', form.fields['price'].label)
+        self.assertEqual('Shelf Life of Product', form.fields['shelf_life'].label)
+        self.assertEqual('Product Category', form.fields['category'].label)
+
+        self.assertEqual('form-control', form.fields['name'].widget.attrs['class'])
+        self.assertEqual('form-control', form.fields['description'].widget.attrs['class'])
+        self.assertEqual('form-control', form.fields['description'].widget.attrs['class'])
+        self.assertEqual('form-control', form.fields['shelf_life'].widget.attrs['class'])
+        self.assertEqual('form-select', form.fields['category'].widget.attrs['class'])
 
 
 class TestProductInstanceForm(TestCase):
@@ -212,8 +291,24 @@ class TestProductInstanceForm(TestCase):
         product_instance = f.save()
         form = ProductInstanceForm(instance=product_instance)
         self.assertEqual(form['product'].value(), product.id)
-        self.assertAlmostEqual(
-            product_instance.manufactured,
-            now,
-            delta=timezone.timedelta(seconds=1)  # Adjust the delta as needed
-        )
+        self.assertEqual(product_instance.manufactured, now)
+
+    def test_field_customization(self):
+        """
+        Test that widgets are used on the fields as specified.
+        """
+        form = ProductInstanceForm()
+        self.assertIn('class="form-control"', str(form))
+        self.assertIn('class="form-select"', str(form['product']))
+        self.assertIn('class="form-control"', str(form['manufactured']))
+
+    def test_widget_customization(self):
+        """
+        Test that widget customizations are eeffected
+        """
+        form = ProductInstanceForm()
+        self.assertEqual('Product', form.fields['product'].label)
+        self.assertEqual('Manufactured Date', form.fields['manufactured'].label)
+
+        self.assertEqual('form-select', form.fields['product'].widget.attrs['class'])
+        self.assertEqual('form-control', form.fields['manufactured'].widget.attrs['class'])
