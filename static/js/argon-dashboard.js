@@ -146,6 +146,7 @@ function sidebarColor(a) {
 
 // Set Sidebar Type
 function sidebarType(a) {
+  console.log('selected color: ', a);
   var parent = a.parentElement.children;
   var color = a.getAttribute("data-class");
   var body = document.querySelector("body");
@@ -560,6 +561,7 @@ function getEventTarget(e) {
 
 // Light Mode / Dark Mode
 function darkMode(el) {
+  console.log('mode: ', el)
   const body = document.getElementsByTagName('body')[0];
   const hr = document.querySelectorAll('div:not(.sidenav) > hr');
   const sidebar = document.querySelector('.sidenav');
