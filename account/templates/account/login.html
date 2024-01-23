@@ -1,7 +1,7 @@
 {% extends 'base/base.html' %}
 {% load static %}
 {% block title %}
-  Registration
+  Sign in
 {% endblock title %}
 {% block top_nav %} {% endblock top_nav %}
  {% block sidebar %}
@@ -16,8 +16,14 @@
             <div class="col-xl-4 col-lg-5 col-md-7 d-flex flex-column mx-lg-0 mx-auto">
               <div class="card card-plain">
                 <div class="card-header pb-0 text-start">
-                  <h4 class="font-weight-bolder">Registration</h4>
-                  {% comment %} <p class="mb-0">Enter your email and password to sign in</p> {% endcomment %}
+                  <h4 class="font-weight-bolder">Sign in</h4>
+                  <p class="mb-0">Enter your email and password to sign in</p>
+                  {% for message in messages %}
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
                 </div>
                 <div class="card-body">
                   <form role="form" method="post">
@@ -28,14 +34,14 @@
                     </div>
                     {% endfor %}
                     <div class="text-center">
-                      <button type="submit" class="btn btn-lg btn-primary btn-lg w-100 mt-4 mb-0">Register</button>
+                      <button type="submit" class="btn btn-lg btn-primary btn-lg w-100 mt-4 mb-0">Sign In</button>
                     </div>
                   </form>
                 </div>
                 <div class="card-footer text-center pt-0 px-lg-2 px-1">
                   <p class="mb-4 text-sm mx-auto">
-                    Already have an account?
-                    <a href="{% url 'account:login' %}" class="text-primary text-gradient font-weight-bold">Sign In</a>
+                    Don't have an account?
+                    <a href="{% url 'account:register' %}" class="text-primary text-gradient font-weight-bold">Sign up</a>
                   </p>
                 </div>
               </div>

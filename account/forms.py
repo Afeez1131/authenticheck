@@ -9,7 +9,7 @@ class RegistrationForm(forms.Form):
     password = forms.CharField(max_length=155, required=True, widget=forms.PasswordInput(attrs={'class': 'form-control form-control-lg', 'placeholder': 'Password'}))
     confirm_password = forms.CharField(max_length=155, required=True, 
     label='Confirm Password', 
-    widget=forms.PasswordInput(attrs={'class': 'form-control form-control-lg', 'placeholder': 'Confirm Password'}))
+    widget=forms.PasswordInput(attrs={'class': 'form-control form-control-lg', 'placeholder': 'Repeat Password'}))
 
     def clean(self):
         cleaned_data = super().clean()
@@ -29,3 +29,19 @@ class RegistrationForm(forms.Form):
                 self.add_error('confirm_password', str(e))
         return cleaned_data
         
+
+class LoginForm(forms.Form):
+    username = forms.CharField(max_length=55,
+                               widget=forms.TextInput(
+                                   attrs={
+                                       'class': 'form-control form-control-lg', 
+                                       'placeholder': 'Username'
+                                       }
+                            ))
+    password = forms.CharField(max_length=55,
+                               widget=forms.PasswordInput(
+                                   attrs={
+                                       'class': 'form-control form-control-lg', 
+                                       'placeholder': 'Password'
+                                       }
+                            ))
