@@ -1,0 +1,76 @@
+{% extends "base/base.html" %} 
+{% load static %} 
+{% block title %}
+ Products
+{% endblock title %} 
+
+{% block content %}
+<main class="main-content mt-0">
+  <section>
+    <div class="page-header min-vh-100">
+      <div class="container">
+        <div class="row">
+            <div class="col-lg-6 col-md-12 col-sm-12 mb-2">
+                <div class="card card-plain">
+                <div class="card-header pb-0 text-start">
+                    <h4 class="font-weight-bolder">Products</h4>
+                    <p class="mb-0">Enter your email</p>
+                    {% for message in messages %}
+                    <div
+                    class="alert alert-warning alert-dismissible fade show"
+                    role="alert">
+                    {{ message }}
+                    <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="alert"
+                        aria-label="Close"></button>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="card-body">
+                    <form role="form" method="post">
+                    {% csrf_token %} 
+                    {% for field in form %}
+                        <div class="mb-3">{{ field }}</div>
+                    {% endfor %}
+                    <div class="text-center">
+                        <button
+                        type="submit"
+                        class="btn btn-lg btn-primary btn-lg w-100 mt-4 mb-0">
+                        Create Product
+                        </button>
+                    </div>
+                    </form>
+                </div>
+                </div>
+            </div>
+            <div class="col-lg-5 col-md-12 col-sm-12">
+                <div class="card card-plain">
+                <div class="card-header pb-0 text-start">
+                    <h4 class="font-weight-bolder">Products</h4>
+                    <p class="mb-0">Enter your email</p>
+                    {% for message in messages %}
+                    <div
+                    class="alert alert-warning alert-dismissible fade show"
+                    role="alert">
+                    {{ message }}
+                    <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="alert"
+                        aria-label="Close"></button>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="card-body">
+                    Product charts
+                </div>
+                </div>
+            </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+{% endblock content %}

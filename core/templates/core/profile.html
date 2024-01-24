@@ -1,0 +1,58 @@
+{% extends "base/base.html" %}
+{% load static %}
+{% block title %}
+    Business Profile
+{% endblock title %}
+{% block content %}
+    <main class="main-content mt-0">
+        <section>
+            <div class="page-header min-vh-100">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-10 col-md-12 col-sm-12 mb-2">
+                            <div class="card ">
+                                <div class="card-header pb-0 text-start">
+                                    <div class="card-header pb-0">
+                                        <div class="d-flex align-items-center">
+                                            <h4 class="font-weight-bolder">Create Business Profile</h4>
+                                          <button class="btn btn-primary btn-sm ms-auto">Settings</button>
+                                        </div>
+                                      </div>
+                                    
+                                    {% comment %} <p class="mb-0">Enter your email</p> {% endcomment %}
+                                    {% for message in messages %}
+                                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                                            {{ message }}
+                                            <button type="button"
+                                                    class="btn-close"
+                                                    data-bs-dismiss="alert"
+                                                    aria-label="Close"></button>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                <div class="card-body">
+                                    <form method="post">
+                                        {% csrf_token %}
+                                        <div class="row">
+                                            {% for field in form %}
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="{{ field.name }}" class="form-control-label">
+                                                            {{ field.label|title }}</label>
+                                                        {{ field }}
+                                                    </div>
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                        <button type="submit" class="btn btn-primary w-100">Create Profile</button>
+                                    </form>
+                                    <hr class="horizontal light">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </section>
+        </main>
+    {% endblock content %}

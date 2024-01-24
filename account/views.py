@@ -8,7 +8,7 @@ from django.contrib.auth.views import LogoutView
 from braces.views import LoginRequiredMixin
 from django.template.loader import render_to_string
 from account.models import OneTimeLogin
-from account.utils import create_one_time_login, send_html_mail
+from account.utils import create_one_time_login, generate_token, send_html_mail
 from .forms import OneTimeLoginForm, RegistrationForm, LoginForm
 from django.contrib import messages
 from django.contrib.auth.tokens import default_token_generator
@@ -64,7 +64,7 @@ class LogoutView(View):
 logout_user = LogoutView.as_view()
 
 
-class SendTimeLoginView(FormView):
+class SendOneTimeLoginView(FormView):
     template_name = "account/send_one_time_login.html"
     form_class = OneTimeLoginForm
 
@@ -82,7 +82,7 @@ class SendTimeLoginView(FormView):
             user = User.objects.get(email=email)
         except User.DoesNotExist:
             return super().form_valid(form)
-        token = default_token_generator.make_token(user)
+        token = generate_token(user.id)
         create_one_time_login(user.id, token)
         login_link = self.request.build_absolute_uri(
             reverse("account:one_time_login", args=[token])
@@ -96,7 +96,7 @@ class SendTimeLoginView(FormView):
         return super().form_valid(form)
 
 
-send_one_time_login = SendTimeLoginView.as_view()
+send_one_time_login = SendOneTimeLoginView.as_view()
 
 
 class OneTimeLoginView(FormView):
@@ -109,12 +109,15 @@ class OneTimeLoginView(FormView):
         token = self.kwargs.get("token", "")
         logger.info(f'email: {email}, token:  {token}')
         try:
-            otl = OneTimeLogin.objects.get(token=token)
+            otl = OneTimeLogin.objects.get(token=token, user__email=email)
         except OneTimeLogin.DoesNotExist:
+            logger.info("does not exist.")
             messages.error(self.request, "invalid request")
             return HttpResponseRedirect(self.request.build_absolute_uri())
+        user = otl.user        
         if token and default_token_generator.check_token(otl.user, token):
-            login(self.request, otl.user)
+            otl.delete()
+            login(self.request, user)
             return super().post(request, *args, **kwargs)
         else:
             messages.error(self.request, "invalid request")

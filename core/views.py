@@ -1,11 +1,13 @@
 from django.shortcuts import render, get_object_or_404
+from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormView
 from django.views.generic import DetailView, TemplateView, ListView
 from .models import Business, Product, ProductInstance
 from braces.views import LoginRequiredMixin
 from .forms import BusinessForm, ProductForm, ProductInstanceForm
 from datetime import datetime
-from django.http import HttpResponseForbidden
+from django.contrib import messages
+from django.http import HttpResponse, HttpResponseForbidden, HttpResponseRedirect
 import logging
 
 logger = logging.getLogger(__name__)
@@ -30,16 +32,28 @@ class DashboardView(LoginRequiredMixin, TemplateView):
 dashboard = DashboardView.as_view()
 
 
-class ProfileView(LoginRequiredMixin, TemplateView):
+class CreateProfileView(LoginRequiredMixin, FormView):
     template_name = "core/profile.html"
+    form_class = BusinessForm
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         business = get_object_or_404(Business, user=self.request.user)
         context['business'] = business
         return context
+    
+    def get_success_url(self):
+        messages.success(self.request, 'Business Profile Created.')
+        return HttpResponseRedirect(self.request.build_absolute_uri())
+    
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)
 
-profile = ProfileView.as_view()
+create_profile = CreateProfileView.as_view()
+
+
+# class ProfileVIew(LoginRequiredMixin, TemplateView):
 
 
 class UpdateProfileView(LoginRequiredMixin, TemplateView):
@@ -76,8 +90,8 @@ class ProductsView(LoginRequiredMixin, CreateView, ListView):
         return context
 
     def get_success_url(self):
-        messages.success(request, "Product Created successfully")
-        return reverse_lazy("products")
+        messages.success(self.request, "Product Created successfully")
+        return reverse_lazy("core:products")
 
 products = ProductsView.as_view()
 
@@ -100,8 +114,8 @@ class ProductInstanceView(LoginRequiredMixin, CreateView, ListView):
         return context
 
     def get_success_url(self):
-        messages.success(request, "Product Instance Created successfully")
-        return reverse_lazy("product_instances")
+        messages.success(self.request, "Product Instance Created successfully")
+        return reverse_lazy("core:product_instances")
     
 product_instances = ProductInstanceView.as_view()
 

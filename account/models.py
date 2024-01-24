@@ -8,6 +8,7 @@ import uuid
 class OneTimeLogin(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     token = models.TextField()
+    attempt = models.PositiveIntegerField(default=0)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 

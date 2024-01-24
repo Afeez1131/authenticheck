@@ -42,8 +42,9 @@
     <link id="pagestyle"
           href="{% static 'css/argon-dashboard.css' %}?v=2.0.4"
           rel="stylesheet" />
+    <link href="{% static 'vendor/bootstrap-select/css/bootstrap-select.css' %}" rel="stylesheet" />
   </head>
-  <body class="g-sidenav-show bg-gray-100 dark-version">
+  <body class="g-sidenav-show bg-gray-100 bg-default">
     <div class="min-height-300 bg-primary position-absolute w-100"></div>
     {% block sidebar %}
       {% include "base/inclusions/sidebars/base_sidebar.html" %}
@@ -152,13 +153,18 @@
       </div>
     </div>
     <!--   Core JS Files   -->
+    <script src="{% static 'js/plugins/jquery.js' %}"></script>
     <script src="{% static 'js/core/popper.min.js' %}"></script>
     <script src="{% static 'js/core/bootstrap.min.js' %}"></script>
     <script src="{% static 'js/plugins/perfect-scrollbar.min.js' %}"></script>
     <script src="{% static 'js/plugins/smooth-scrollbar.min.js' %}"></script>
     <script src="{% static 'js/plugins/chartjs.min.js' %}"></script>
-    <script src="{% static 'js/dashboard_chart.js' %}"></script>
+    <script src="{% static 'vendor/bootstrap-select/js/bootstrap-select.min.js' %}"></script>
     <script>
+      $(document).ready(function() {
+        $('.select2').selectpicker();
+     });
+     
     var win = navigator.platform.indexOf('Win') > -1;
     if (win && document.querySelector('#sidenav-scrollbar')) {
       var options = {
@@ -171,5 +177,8 @@
     <script async defer src="https://buttons.github.io/buttons.js"></script>
     <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
     <script src="{% static 'js/argon-dashboard.min.js' %}?v=2.0.4"></script>
+    {% block js %}
+
+    {% endblock js %}
   </body>
 </html>

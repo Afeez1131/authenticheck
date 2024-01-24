@@ -7,7 +7,7 @@ from datetime import timedelta
 class BusinessForm(forms.ModelForm):
     class Meta:
         model = Business
-        fields = ["name", "description", "address", "phone", "website", "email"]
+        fields = ["name",  "phone", "website", "email", "address", "description",]
         labels = {
             "name": "Business Name",
             "description": "About Business",
@@ -41,9 +41,9 @@ class ProductForm(forms.ModelForm):
         widgets = {
             "name": forms.TextInput(attrs={'class': 'form-control', 'placeholder': "Product Name"}),
             "description": forms.Textarea(attrs={'class': 'form-control', 'placeholder': "Product Description", "rows": 5, "cols": 10}),
-            "price": forms.NumberInput(attrs={'class': 'form-control', 'placeholder': "Product Price"}),
-            "shelf_life": forms.NumberInput(attrs={'class': 'form-control', 'placeholder': "Product Expected Shelf Life"}),
-            "category": forms.Select(attrs={'class': 'form-select'})
+            "price": forms.NumberInput(attrs={'class': 'form-control', 'placeholder': "Product Price", "min": 0}),
+            "shelf_life": forms.NumberInput(attrs={'class': 'form-control', 'placeholder': "Product Expected Shelf Life", "min": 0}),
+            "category": forms.Select(attrs={'class': 'select2 w-100'})
         }
     
     def clean(self):

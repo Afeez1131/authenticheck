@@ -1,5 +1,6 @@
-{% extends 'base/base.html' %}
+{% extends "base/base.html" %}
 
+{% load static %}
 {% block title %}
   Dashboard
 {% endblock title %}
@@ -383,3 +384,7 @@
   </div>
 {% endblock content %}
   
+{% block js %}
+<script src="{% static 'js/dashboard_chart.js' %}"></script>
+
+{% endblock js %}

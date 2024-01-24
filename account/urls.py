@@ -8,5 +8,5 @@ urlpatterns = [
     path("login/", views.login_user, name="login"),
     path("logout/", views.logout_user, name="logout"),
     path("one-time-login", views.send_one_time_login, name="send_one_time_login"),
-    path("one-time-login/<token>", views.one_time_login, name="one_time_login"),
+    path("login/<token>", views.one_time_login, name="one_time_login"),
 ]
