@@ -45,3 +45,15 @@ class LoginForm(forms.Form):
                                        'placeholder': 'Password'
                                        }
                             ))
+    
+
+class OneTimeLoginForm(forms.Form):
+    email = forms.CharField(max_length=155,
+                            label="Email used for Registration",
+                            widget=forms.EmailInput(attrs={'class': 'form-control form-control-lg',
+                                                           'placeholder': 'E-mail'}))
+    
+
+    # def clean(self):
+    #     email = self.cleaned_data.get('email', '')
+    #     if not User.objects.filter(email=email).exists()

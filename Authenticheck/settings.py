@@ -171,6 +171,12 @@ LOGGING = {
             "filename": os.path.join(BASE_DIR, "logs/core.log"),
             "delay": True,  # Add the delay parameter
         },
+        "account_logfile": {
+            "class": "logging.FileHandler",
+            "formatter": "verbose",
+            "filename": os.path.join(BASE_DIR, 'logs/account.log'),
+            "delay": True
+        },
         "mail_admins": {
             "level": "ERROR",
             "class": "django.utils.log.AdminEmailHandler",
@@ -182,11 +188,16 @@ LOGGING = {
             "level": "DEBUG",
             "propagate": True,
         },
-        "django": {
-            "handlers": ["mail_admins"],
-            "level": "ERROR",
-            "propagate": False,
-        }
+        "account": {
+            "handlers": ["account_logfile", "console"],
+            "level": "DEBUG",
+            "propagate": True
+        },
+        # "django": {
+        #     "handlers": ["mail_admins"],
+        #     "level": "ERROR",
+        #     "propagate": False,
+        # }
     }
 }
 

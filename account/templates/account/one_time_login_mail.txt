@@ -1,0 +1,12 @@
+One-Time Login
+
+Hello {{ user }}
+
+You have requested a one-time login. To proceed, click the link below:
+
+{{ login_link }}
+
+If you did not request this login, you can ignore this email.
+
+Best regards,
+Authenticheck Team
