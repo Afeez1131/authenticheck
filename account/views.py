@@ -74,11 +74,9 @@ class SendTimeLoginView(FormView):
             self.request,
             "An email containing your One Time Password would be sent to the mail provided if valid.",
         )
-        return self.request.build_absolute_uri()
+        return HttpResponseRedirect(self.request.build_absolute_uri())
 
     def form_valid(self, form):
-        logger.info(f"{form}")
-        print('form: ', form)
         email = form.cleaned_data.get("email", "")
         try:
             user = User.objects.get(email=email)
@@ -105,10 +103,6 @@ class OneTimeLoginView(FormView):
     template_name = "account/one_time_login.html"
     form_class = OneTimeLoginForm
     success_url = reverse_lazy("core:dashboard")
-
-    def get(self, request, *args, **kwargs):
-        logger.info('in theget view...')
-        return super().get(request, *args, **kwargs)
     
     def post(self, request, *args, **kwargs):
         email = request.POST.get("email", "")
@@ -118,13 +112,13 @@ class OneTimeLoginView(FormView):
             otl = OneTimeLogin.objects.get(token=token)
         except OneTimeLogin.DoesNotExist:
             messages.error(self.request, "invalid request")
-            return HttpResponseRedirect(reverse('account:login'))
+            return HttpResponseRedirect(self.request.build_absolute_uri())
         if token and default_token_generator.check_token(otl.user, token):
             login(self.request, otl.user)
             return super().post(request, *args, **kwargs)
         else:
             messages.error(self.request, "invalid request")
-        return HttpResponseRedirect(reverse('account:login'))
+        return HttpResponseRedirect(self.request.build_absolute_uri())
         # return super().post(request, *args, **kwargs)
 
 
