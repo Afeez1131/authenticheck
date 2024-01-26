@@ -25,9 +25,13 @@ class RegistrationView(FormView):
     success_url = reverse_lazy("account:login")
 
     def form_valid(self, form):
+        User.objects.create_user(**form.cleaned_data)
         messages.success(self.request, "Registration Successful")
         return super().form_valid(form)
 
+    def form_invalid(self, form):
+        print(form.errors)
+        return super().form_invalid(form)
 
 registration = RegistrationView.as_view()
 

@@ -43,6 +43,7 @@
           href="{% static 'css/argon-dashboard.css' %}?v=2.0.4"
           rel="stylesheet" />
     <link href="{% static 'vendor/bootstrap-select/css/bootstrap-select.css' %}" rel="stylesheet" />
+    {% block extra_style %} {% endblock extra_style %}
   </head>
   <body class="g-sidenav-show bg-gray-100 bg-default">
     <div class="min-height-300 bg-primary position-absolute w-100"></div>

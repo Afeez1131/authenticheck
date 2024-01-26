@@ -27,7 +27,7 @@ class RegistrationForm(forms.Form):
             except ValidationError as e:
                 self.add_error('password', str(e))
                 self.add_error('confirm_password', str(e))
-        return cleaned_data
+        return {"username": email, "password": password, "email": email}
         
 
 class LoginForm(forms.Form):

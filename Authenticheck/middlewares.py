@@ -12,7 +12,7 @@ class UserHasBusinessMiddleware:
     def __call__(self, request):
         if request.user.is_authenticated:
             has_business = Business.objects.filter(user=request.user).exists()
-            logger.info(request.path, reverse('core:create_profile'))
+            logger.info(f"{request.path}, {reverse('core:create_profile')}")
             if not has_business and request.path != reverse('account:logout') and request.path != reverse('core:create_profile'):
                 return HttpResponseRedirect(reverse('core:create_profile'))
     
