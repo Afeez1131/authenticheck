@@ -57,3 +57,16 @@ class OneTimeLoginForm(forms.Form):
     # def clean(self):
     #     email = self.cleaned_data.get('email', '')
     #     if not User.objects.filter(email=email).exists()
+    
+        """
+        generics.edit.FormView:
+        - user when you are working with a form that you are not calling save on, 
+        i.e form.save()
+        - use in situation where you are getting the form fields for processing by yoursefl and 
+        e.g. Login, Registration.
+        
+        CreateView:
+        different between CreateVIew and FormView is that you can call .save on a CreateView
+        - you can also get the field for processing by yourself,
+        - can also be used in Login, Registration view, but not efficient.
+        """
