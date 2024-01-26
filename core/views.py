@@ -17,7 +17,6 @@ class DashboardView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(DashboardView, self).get_context_data(**kwargs)
-        logger.info("in the dashboard")
         user = self.request.user
         business =  get_object_or_404(Business, user=user)
         products = business.product_set.all()
@@ -32,19 +31,17 @@ class DashboardView(LoginRequiredMixin, TemplateView):
 dashboard = DashboardView.as_view()
 
 
-class CreateProfileView(LoginRequiredMixin, FormView):
-    template_name = "core/profile.html"
+class CreateProfileView(LoginRequiredMixin, CreateView):
+    template_name = "core/create_profile.html"
     form_class = BusinessForm
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        business = get_object_or_404(Business, user=self.request.user)
-        context['business'] = business
         return context
     
     def get_success_url(self):
         messages.success(self.request, 'Business Profile Created.')
-        return HttpResponseRedirect(self.request.build_absolute_uri())
+        return reverse_lazy('core:profile')
     
     def form_valid(self, form):
         form.instance.user = self.request.user
@@ -53,21 +50,17 @@ class CreateProfileView(LoginRequiredMixin, FormView):
 create_profile = CreateProfileView.as_view()
 
 
-# class ProfileVIew(LoginRequiredMixin, TemplateView):
-
-
 class UpdateProfileView(LoginRequiredMixin, TemplateView):
     form_class = BusinessForm
     model = Business
-    template_name = "update_profile.html"
+    template_name = "core/profile.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         business = get_object_or_404(Business, user=self.request.user)
+        context['business'] = business
         context['form'] = self.form_class(instance=business)
         return context
-
-    # def 
 
 update_profile = UpdateProfileView.as_view()
 
