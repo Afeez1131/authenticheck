@@ -14,6 +14,7 @@ from django.contrib import messages
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.models import User
 from django.contrib.auth import login, logout, authenticate
+from django.utils.safestring import mark_safe
 from django.conf import settings
 
 logger = logging.getLogger(__name__)
@@ -30,7 +31,11 @@ class RegistrationView(FormView):
         return super().form_valid(form)
 
     def form_invalid(self, form):
-        print(form.errors)
+        error_list = []
+        for field, errors in form.errors.items():
+            for error in errors:
+                error_list.append(f"{error}")
+        messages.error(self.request, mark_safe('<br/>'.join(error_list)))
         return super().form_invalid(form)
 
 registration = RegistrationView.as_view()

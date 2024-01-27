@@ -17,23 +17,16 @@
                                     <div class="card-header pb-0">
                                         <div class="d-flex align-items-center">
                                             <h4 class="font-weight-bolder"> {{ business.name }} Profile</h4>
-                                          <button class="btn btn-primary btn-sm ms-auto">Settings</button>
+                                          <button class="btn btn-primary btn-sm ms-auto"
+                                          onclick="updateProfile();">Update</button>
                                         </div>
                                       </div>
                                     
                                     {% comment %} <p class="mb-0">Enter your email</p> {% endcomment %}
-                                    {% for message in messages %}
-                                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                                            {{ message }}
-                                            <button type="button"
-                                                    class="btn-close"
-                                                    data-bs-dismiss="alert"
-                                                    aria-label="Close"></button>
-                                        </div>
-                                    {% endfor %}
-                                </div>
+                                    
+                                                                    </div>
                                 <div class="card-body">
-                                    <form method="post">
+                                    <form method="post" id="update-form">
                                         {% csrf_token %}
                                         <div class="row">
                                             {% for field in form %}
@@ -46,7 +39,9 @@
                                                 </div>
                                             {% endfor %}
                                         </div>
-                                        <button type="submit" class="btn btn-primary w-100">Create Profile</button>
+                                        <button type="submit" class="btn btn-primary w-100" id="update-button" style="display: none;">
+                                            Update Profile
+                                        </button>
                                     </form>
                                     <hr class="horizontal light">
                                 </div>
@@ -58,3 +53,19 @@
             </section>
         </main>
     {% endblock content %}
+{% block extra_script %}
+<script>
+    $(document).ready(function() {
+        $("input, textarea").each(function() {
+            $(this).attr('disabled', 'disable');
+          })
+    })
+
+    function updateProfile() {
+        $("input, textarea").each(function() {
+            $(this).removeAttr('disabled');
+        })
+        $("#update-button").show();
+    }
+</script>
+{% endblock extra_script%}

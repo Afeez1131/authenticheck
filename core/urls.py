@@ -6,7 +6,7 @@ app_name = 'core'
 urlpatterns = [
     path("", views.dashboard, name="dashboard"),
     path("create-profile", views.create_profile, name='create_profile'),
-    path("profile", views.update_profile, name='profile'),
+    path("profile", views.business_profile, name='profile'),
     path("products", views.products, name='products'),
     path("product-instances", views.product_instances, name='product_instances'),
     path("500", views.http_500),

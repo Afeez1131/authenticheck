@@ -1,0 +1,5 @@
+{% for message in messages %}
+    <script>
+        showCToast("{{ message.tags }}", "{{ message }}");
+    </script>
+{% endfor %}

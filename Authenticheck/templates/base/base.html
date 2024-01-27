@@ -13,6 +13,7 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 -->
 {% load static %}
+{% load general_tags %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -43,6 +44,7 @@
           href="{% static 'css/argon-dashboard.css' %}?v=2.0.4"
           rel="stylesheet" />
     <link href="{% static 'vendor/bootstrap-select/css/bootstrap-select.css' %}" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     {% block extra_style %} {% endblock extra_style %}
   </head>
   <body class="g-sidenav-show bg-gray-100 bg-default">
@@ -56,18 +58,7 @@
         {% include "base/top_navs.html" %}
       {% endblock top_nav %}
       {% block content %}
-        {% block messages %}
-          {% for message in messages %}
-            <div class="alert alert-{{ message.tags }} alert-dismissible fade show"
-                 role="alert">
-              {{ message }}
-              <button type="button"
-                      class="btn-close"
-                      data-bs-dismiss="alert"
-                      aria-label="Close"></button>
-            </div>
-          {% endfor %}
-        {% endblock messages %}
+        
       {% endblock content %}
       {% include "base/inclusions/footer.html" %}
     </main>
@@ -161,6 +152,7 @@
     <script src="{% static 'js/plugins/smooth-scrollbar.min.js' %}"></script>
     <script src="{% static 'js/plugins/chartjs.min.js' %}"></script>
     <script src="{% static 'vendor/bootstrap-select/js/bootstrap-select.min.js' %}"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script>
       $(document).ready(function() {
         $('.select2').selectpicker();
@@ -173,13 +165,53 @@
       }
       Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
     }
+
+    function showCToast(type, message) {
+      const colorMap = {
+          "info": '#63B3ED',
+          "success": '#2dce89',
+          "error": '#f5365c',
+          "default": "#20c997"
+      };
+  
+      const color = colorMap[type] || colorMap["default"];
+  
+      Toastify({
+          text: message,
+          duration: 3000,
+          className: type,
+          close: true,
+          gravity: "top", // `top` or `bottom`
+          position: "center", // `left`, `center` or `right`
+          stopOnFocus: true, // Prevents dismissing of toast on hover
+          style: {
+              background: color,
+          },
+          escapeMarkup: false,
+      }).showToast();
+  }
+  
+  
+    const customMessages = [
+    {% for message in messages %}
+        {
+            "tags": "{{ message.tags|default:'' }}",
+            "message": '{{ message.message|default:'' }}'
+        }{% if not forloop.last %},{% endif %}
+    {% endfor %}
+    ];
+
+    customMessages.forEach(message => {
+      showCToast(message.tags, message.message);
+    });
+
     </script>
     <!-- Github buttons -->
     <script async defer src="https://buttons.github.io/buttons.js"></script>
     <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
     <script src="{% static 'js/argon-dashboard.min.js' %}?v=2.0.4"></script>
-    {% block js %}
+    {% block extra_script %}
 
-    {% endblock js %}
+    {% endblock extra_script %}
   </body>
 </html>

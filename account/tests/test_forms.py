@@ -22,7 +22,7 @@ class RegistrationTestCase(TestCase):
         self.assertEqual('Password', form.fields['password'].widget.attrs['placeholder'])
 
         self.assertEqual('form-control form-control-lg', form.fields['confirm_password'].widget.attrs['class'])
-        self.assertEqual('Confirm Password', form.fields['confirm_password'].widget.attrs['placeholder'])
+        self.assertEqual('Repeat Password', form.fields['confirm_password'].widget.attrs['placeholder'])
 
     def test_registration_form_with_invalid_data(self):
         """
@@ -64,8 +64,6 @@ class RegistrationTestCase(TestCase):
         self.assertTrue(form.is_valid())
         self.assertEqual(len(form.errors), 0)
         d = form.cleaned_data
-        d.pop('confirm_password')
-        d.update({'username': d.get('email')})
         user = create_user(**d)
         self.assertEqual(User.objects.count(), 1)
         self.assertTrue(User.objects.get(email='temp@gmail.com'))
@@ -86,8 +84,6 @@ class RegistrationTestCase(TestCase):
         self.assertTrue(form.is_valid())
         self.assertEqual(len(form.errors), 0)
         d = form.cleaned_data
-        d.pop('confirm_password')
-        d.update({'username': d.get('email')})
         create_user(**d)
         d.pop('username')
         d.update({'confirm_password': d.get('password')})

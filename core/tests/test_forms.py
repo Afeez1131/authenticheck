@@ -195,7 +195,7 @@ class ProductFormTestCase(TestCase):
         self.assertIn('class="form-control"', str(form['shelf_life']))
         self.assertIn('placeholder="Product Expected Shelf Life"', str(form['shelf_life']))
 
-        self.assertIn('class="form-select"', str(form['category']))
+        self.assertIn('class="select2 w-100"', str(form['category']))
 
     def test_widget_customization(self):
         """
@@ -212,7 +212,7 @@ class ProductFormTestCase(TestCase):
         self.assertEqual('form-control', form.fields['description'].widget.attrs['class'])
         self.assertEqual('form-control', form.fields['description'].widget.attrs['class'])
         self.assertEqual('form-control', form.fields['shelf_life'].widget.attrs['class'])
-        self.assertEqual('form-select', form.fields['category'].widget.attrs['class'])
+        self.assertEqual('select2 w-100', form.fields['category'].widget.attrs['class'])
 
 
 class TestProductInstanceForm(TestCase):

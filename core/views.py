@@ -50,19 +50,27 @@ class CreateProfileView(LoginRequiredMixin, CreateView):
 create_profile = CreateProfileView.as_view()
 
 
-class UpdateProfileView(LoginRequiredMixin, TemplateView):
+class UpdateProfileView(LoginRequiredMixin, UpdateView):
     form_class = BusinessForm
     model = Business
     template_name = "core/profile.html"
+    # success_url = reverse_lazy('core:profile')
+    
+    def get_success_url(self):
+        messages.success(self.request, 'Profile Updated Successfully.')
+        return reverse_lazy('core:profile')
+    
+    def get_object(self, queryset=None):
+        return get_object_or_404(Business, user=self.request.user)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         business = get_object_or_404(Business, user=self.request.user)
         context['business'] = business
-        context['form'] = self.form_class(instance=business)
+        # context['form'] = self.form_class(instance=business)
         return context
 
-update_profile = UpdateProfileView.as_view()
+business_profile = UpdateProfileView.as_view()
 
 
 class ProductsView(LoginRequiredMixin, CreateView, ListView):
