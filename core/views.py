@@ -86,7 +86,7 @@ class ProductsView(LoginRequiredMixin, CreateView, ListView):
 
     def get_queryset(self):
         queryset = super(ProductsView, self).get_queryset()
-        return queryset
+        return queryset.filter(business__user=self.request.user)
 
     def get_context_data(self, **kwargs):
         self.object_list = self.get_queryset()
