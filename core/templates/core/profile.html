@@ -5,9 +5,10 @@
 {% endblock title %}
 
 {% block content %}
-
+    
     <main class="main-content mt-0">
         <section>
+           
             <div class="page-header min-vh-100">
                 <div class="container">
                     <div class="row">
@@ -16,6 +17,7 @@
                                 <div class="card-header pb-0 text-start">
                                     <div class="card-header pb-0">
                                         <div class="d-flex align-items-center">
+                                            {{ request.path }}, {{ request.resolver_match.url_name }}
                                             <h4 class="font-weight-bolder"> {{ business.name }} Profile</h4>
                                           <button class="btn btn-primary btn-sm ms-auto"
                                           onclick="updateProfile();">Update</button>

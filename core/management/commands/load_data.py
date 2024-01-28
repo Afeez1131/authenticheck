@@ -9,16 +9,21 @@ import random
 
 class Command(BaseCommand):
     def add_arguments(self, parser):
+        parser.add_argument("--id", type=int)
         parser.add_argument("--product", type=int)
         parser.add_argument("--instance", type=int)
 
     def handle(self, *args, **options):
         product_count = options.get("product", "")
         instance_count = options.get("instance", "")
-        if not product_count or not instance_count:
+        pk = options.get("id", "")
+        if not product_count or not instance_count or not pk:
             raise CommandError("You need specify the number of records to create '--count 20'")
-        user = User.objects.first()
-        business,_ = Business.objects.get_or_create(user=user, name="Dangote PLC.", description="Description",
+        user = User.objects.get(pk=pk)
+        try:
+            business = user.business
+        except Business.DoesNotExist:
+            business,_ = Business.objects.get_or_create(user=user, name="Ganaf PLC.", description="Description",
             address="Address", phone="08105506043", website="dangote.ng", email="dangote@ng.com")
         for c in range(product_count):
             name = f'Prod-{uuid.uuid4().hex[:6]}'

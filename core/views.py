@@ -2,11 +2,14 @@ from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormView
 from django.views.generic import DetailView, TemplateView, ListView
+
+from core.utils import top_nine_product
 from .models import Business, Product, ProductInstance
 from braces.views import LoginRequiredMixin
 from .forms import BusinessForm, ProductForm, ProductInstanceForm
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.contrib import messages
+from django.db.models import Count
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseRedirect
 import logging
 
@@ -20,8 +23,9 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         user = self.request.user
         business =  get_object_or_404(Business, user=user)
         products = business.product_set.all()
-        instances_created_today = ProductInstance.objects.filter(created__date=datetime.now().date()).count()
-        recent_instances = ProductInstance.objects.all()[:10]
+        instances_created_today = ProductInstance.objects.filter(product__business__user=user, created__date=datetime.now().date()).count()
+        recent_instances = ProductInstance.objects.filter(product__business__user=user).order_by('-created')[:10]
+        context['top_nine_product'] = top_nine_product(user.id)
         context['product_count'] = products.count()
         context['instances_created_today'] = instances_created_today
         context['recent_instances'] = recent_instances
@@ -93,6 +97,11 @@ class ProductsView(LoginRequiredMixin, CreateView, ListView):
     def get_success_url(self):
         messages.success(self.request, "Product Created successfully")
         return reverse_lazy("core:products")
+    
+    def form_valid(self, form):
+        business = get_object_or_404(Business, user=self.request.user)
+        form.instance.business = business
+        return super().form_valid(form)
 
 products = ProductsView.as_view()
 

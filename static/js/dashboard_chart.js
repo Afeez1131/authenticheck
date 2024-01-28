@@ -1,4 +1,20 @@
-console.log('from here..')
+
+$(document).ready(function() {
+  $.ajax({
+    url: '/product-instance-chart',
+    type: 'GET',
+    dataType:'json',
+    success: function (resp) {
+      renderCharts(resp.products, resp.instances)
+    },
+    error: function (xhr) {
+      console.log(xhr)
+    }
+  })
+})
+
+
+function renderCharts(xvalues, yvalues) {
 var ctx1 = document.getElementById("chart-line").getContext("2d");
 
     var gradientStroke1 = ctx1.createLinearGradient(0, 230, 0, 50);
@@ -9,9 +25,9 @@ var ctx1 = document.getElementById("chart-line").getContext("2d");
     new Chart(ctx1, {
       type: "line",
       data: {
-        labels: ["Jan", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+        labels: xvalues,
         datasets: [{
-          label: "Mobile apps",
+          label: "Instance",
           tension: 0.4,
           borderWidth: 0,
           pointRadius: 0,
@@ -19,7 +35,7 @@ var ctx1 = document.getElementById("chart-line").getContext("2d");
           backgroundColor: gradientStroke1,
           borderWidth: 3,
           fill: true,
-          data: [50, 40, 300, 220, 500, 250, 400, 230, 500],
+          data: yvalues,
           maxBarThickness: 6
 
         }],
@@ -80,3 +96,4 @@ var ctx1 = document.getElementById("chart-line").getContext("2d");
         },
       },
     });
+  }

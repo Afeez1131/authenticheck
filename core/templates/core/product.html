@@ -11,22 +11,10 @@
       <div class="container">
         <div class="row">
             <div class="col-lg-6 col-md-12 col-sm-12 mb-2">
-                <div class="card card-plain">
+                <div class="card">
                 <div class="card-header pb-0 text-start">
                     <h4 class="font-weight-bolder">Products</h4>
                     <p class="mb-0">Enter your email</p>
-                    {% for message in messages %}
-                    <div
-                    class="alert alert-warning alert-dismissible fade show"
-                    role="alert">
-                    {{ message }}
-                    <button
-                        type="button"
-                        class="btn-close"
-                        data-bs-dismiss="alert"
-                        aria-label="Close"></button>
-                    </div>
-                    {% endfor %}
                 </div>
                 <div class="card-body">
                     <form role="form" method="post">
@@ -46,7 +34,7 @@
                 </div>
             </div>
             <div class="col-lg-5 col-md-12 col-sm-12">
-                <div class="card card-plain">
+                <div class="card">
                 <div class="card-header pb-0 text-start">
                     <h4 class="font-weight-bolder">Products</h4>
                     <p class="mb-0">Enter your email</p>
@@ -69,8 +57,53 @@
                 </div>
             </div>
         </div>
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12">
+                <div class="card">
+                <div class="card-header pb-0 text-start">
+                    <h4 class="font-weight-bolder">All Products</h4>
+                    <p class="mb-0">Enter your email</p>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table id="example" class="display table-primary" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Name</th>
+                                    <th>Price</th>
+                                    <th>Shelf Life</th>
+                                    <th>Category</th>
+                                    <th>Created</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for product in products %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ product.name }}</td>
+                                    <td>&#8358;{{ product.price }}</td>
+                                    <td>{{ product.shelf_life}} days</td>
+                                    <td>{{ product.category }}</td>
+                                    <td>{{ product.created }}</td>
+                                </tr>
+
+                                {% endfor %}
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+                </div>
+            </div>
+        </div>
       </div>
     </div>
   </section>
 </main>
 {% endblock content %}
+{% block extra_script %}
+<script>
+    new DataTable("#example");
+</script>
+{% endblock%}

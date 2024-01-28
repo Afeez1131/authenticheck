@@ -1,6 +1,6 @@
 from .models import Business, Product, ProductInstance
 from django.http import JsonResponse
-from django.contrib.auth.decorator import login_required
+from django.contrib.auth.decorators import login_required
 
 
 @login_required
@@ -15,5 +15,4 @@ def product_instances_chart_data(request):
         instances_count = product.productinstance_set.count()
         chart_data["products"].append(product.name)
         chart_data["instances"].append(instances_count)
-    print(chart_data)
     return JsonResponse(chart_data)
