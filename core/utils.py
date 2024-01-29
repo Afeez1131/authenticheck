@@ -28,3 +28,9 @@ def top_nine_product(uid):
         item['product'] = products_mapping.get(item['product'])
     return top_ten
     
+    
+def redirect_to_referrer(request, redirect_to):
+    referer = request.META.get('HTTP_REFERER', '')
+    if referer and referer != request.build_absolute_uri():
+        return referer
+    return redirect_to

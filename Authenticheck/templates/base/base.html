@@ -45,7 +45,7 @@
           rel="stylesheet" />
     <link href="{% static 'vendor/bootstrap-select/css/bootstrap-select.css' %}" rel="stylesheet" />
     <link href="{% static 'vendor/datatable/datatables.min.css' %}" rel="stylesheet" />
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <link rel="stylesheet" type="text/css" href="{% static 'vendor/toastify/toastify.css' %}">
     {% block extra_style %} {% endblock extra_style %}
   </head>
   <body class="g-sidenav-show bg-gray-100 bg-default">
@@ -154,7 +154,7 @@
     <script src="{% static 'js/plugins/chartjs.min.js' %}"></script>
     <script src="{% static 'vendor/bootstrap-select/js/bootstrap-select.min.js' %}"></script>
     <script src="{% static 'vendor/datatable/datatables.min.js' %}"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script type="text/javascript" src="{% static 'vendor/toastify/toastify.js' %}"></script>
     <script>
       $(document).ready(function() {
         $('.select2').selectpicker();

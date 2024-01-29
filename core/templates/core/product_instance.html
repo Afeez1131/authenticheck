@@ -1,0 +1,137 @@
+{% extends "base/base.html" %} 
+{% load static %} 
+{% load humanize %}
+{% block title %}
+ Products
+{% endblock title %} 
+
+{% block content %}
+<main class="main-content mt-0">
+  <section>
+    <div class="page-header min-vh-100">
+      <div class="container">
+        
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12">
+                <div class="card">
+                <div class="card-header pb-0 text-start">
+                    <div class="d-flex align-items-center">
+                        <h4 class="font-weight-bolder"> Instances for {{ product }}</h4>
+                      <button class="btn btn-primary btn-sm ms-auto"
+                        data-bs-target="#create-modal" 
+                        data-bs-toggle="modal">
+                        + New Product Instance
+                    </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table id="example" class="display table-primary" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Product</th>
+                                    <th>Price</th>
+                                    <th>Manufactured</th>
+                                    <th>Expiry Date</th>
+                                    <th>Created</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for instance in product_instances %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ instance.product }}</td>
+                                    <td>&#8358;{{ instance.product.price|intcomma }}</td>
+                                    <td>{{ instance.manufactured }}</td>
+                                    <td>{{ instance.expiry_date }}</td>
+                                    <td> <a class="btn btn-sm btn-primary" 
+                                      href="">
+                                          Update
+                                      </a></td>
+                                    <td>
+                                      <a class="btn btn-sm btn-danger" href="" 
+                                      onclick="deleteModal('{{ instance }}', '{{ instance.pk}}')"
+                                      data-bs-toggle="modal" data-bs-target="#delete-modal">
+                                            Delete
+                                        </a>
+                                    </td>
+                                </tr>
+
+                                {% endfor %}
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+                </div>
+            </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+      <div class="modal fade" id="create-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+            <form role="form" method="post">
+
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">New Instance for {{ product }}</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+                {% csrf_token %} 
+                {% for field in form %}
+                    <label for="id_{{field.name}}">
+                        {{ field.label }}
+                    </label>
+                    <div class="mb-1">
+                        {{ field }}
+                    </div>
+                {% endfor %}
+                
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Create</button>
+          </div>
+        </form>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="delete-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+            <form role="form" method="post" action="{% url 'core:delete_product_instance' %}">
+              {% csrf_token %}
+            <input type="hidden" name="instance_id" id="iid">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Delete {{ product }}</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+                
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-danger">Delete</button>
+          </div>
+        </form>
+
+        </div>
+      </div>
+    </div>
+{% endblock content %}
+{% block extra_script %}
+<script>
+    new DataTable("#example");
+    function deleteModal(instance_name, instance_id){
+      $("#delete-modal .modal-body").html('Are you sure you want to delete ' + instance_name);
+      $("#delete-modal #iid").val(instance_id);
+    }
+</script>
+{% endblock%}

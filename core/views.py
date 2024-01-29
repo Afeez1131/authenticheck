@@ -1,16 +1,17 @@
 from django.shortcuts import render, get_object_or_404
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormView
 from django.views.generic import DetailView, TemplateView, ListView
 
-from core.utils import top_nine_product
+from core.utils import redirect_to_referrer, top_nine_product
 from .models import Business, Product, ProductInstance
 from braces.views import LoginRequiredMixin
 from .forms import BusinessForm, ProductForm, ProductInstanceForm
 from datetime import datetime, timedelta
 from django.contrib import messages
 from django.db.models import Count
-from django.http import HttpResponse, HttpResponseForbidden, HttpResponseRedirect
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse, HttpResponseRedirect
 import logging
 
 logger = logging.getLogger(__name__)
@@ -107,7 +108,7 @@ products = ProductsView.as_view()
 
 
 class ProductInstanceView(LoginRequiredMixin, CreateView, ListView):
-    model = Product
+    model = ProductInstance
     template_name = "core/product_instance.html"
     paginate_by = 100
     form_class = ProductInstanceForm
@@ -115,19 +116,43 @@ class ProductInstanceView(LoginRequiredMixin, CreateView, ListView):
 
     def get_queryset(self):
         queryset = super(ProductInstanceView, self).get_queryset()
-        return queryset
+        pk = self.kwargs.get('pk', '')
+        product = get_object_or_404(Product, pk=pk)
+        return queryset.filter(product=product)
 
     def get_context_data(self, **kwargs):
         self.object_list = self.get_queryset()
         context = super().get_context_data(*kwargs)
         context["edit_form"] = ProductInstanceForm(prefix="edit")
+        pk = self.kwargs.get('pk', '')
+        product = get_object_or_404(Product, pk=pk)
+        context['product'] = product
         return context
 
     def get_success_url(self):
         messages.success(self.request, "Product Instance Created successfully")
         return reverse_lazy("core:product_instances")
     
+    def form_valid(self, form):
+        pk = self.kwargs.get('pk', '')
+        product = get_object_or_404(Product, pk=pk)
+        form.instance.product = product
+        return super().form_valid(form)
+    
 product_instances = ProductInstanceView.as_view()
+
+
+@login_required
+def delete_product_instance(request):
+    url = redirect_to_referrer(request, reverse('core:products'))
+    if request.method != 'POST' or not request.POST.get('instance_id', ''):
+        messages.error(request, 'Invalid request')
+        return HttpResponseRedirect(url)
+    instance_id = request.POST.get('instance_id', '')
+    instance = get_object_or_404(ProductInstance, id=instance_id)
+    instance.delete()
+    messages.success(request, 'Instance successfully deleted')
+    return HttpResponseRedirect(url)
 
 
 def http_500(request):

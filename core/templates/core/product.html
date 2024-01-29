@@ -47,7 +47,8 @@
                                     <td>{{ product.category }}</td>
                                     <td>{{ product.created }}</td>
                                     <td>
-                                        <a class="btn btn-sm btn-primary" href="#">
+                                        <a class="btn btn-sm btn-primary" 
+                                        href="{% url 'core:product_instances' product.pk %}">
                                             Details
                                         </a>
                                     </td>

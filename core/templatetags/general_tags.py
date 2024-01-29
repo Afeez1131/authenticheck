@@ -36,7 +36,6 @@ def abbr_timesince(value):
 @register.simple_tag
 def is_active(request, view_name):
     url = reverse(view_name)
-    print('url: ', url, request.path)
     if request.path == url:
         return 'active'
     return ''

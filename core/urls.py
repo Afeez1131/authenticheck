@@ -9,7 +9,8 @@ urlpatterns = [
     path("create-profile", views.create_profile, name='create_profile'),
     path("profile", views.business_profile, name='profile'),
     path("products", views.products, name='products'),
-    path("product-instances", views.product_instances, name='product_instances'),
+    path("products/<int:pk>", views.product_instances, name='product_instances'),
+    path("delete-product", views.delete_product_instance, name='delete_product_instance'),
     
     # ajax
     path('product-instance-chart', ajax_views.product_instances_chart_data),
