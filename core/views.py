@@ -10,6 +10,7 @@ from .forms import BusinessForm, ProductForm, ProductInstanceForm
 from datetime import datetime, timedelta
 from django.contrib import messages
 from django.db.models import Count
+from django.utils.safestring import mark_safe
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect
 import logging
@@ -91,8 +92,8 @@ class ProductsView(LoginRequiredMixin, CreateView, ListView):
 
     def get_context_data(self, **kwargs):
         self.object_list = self.get_queryset()
-        context = super().get_context_data(*kwargs)
-        context['edit_product'] = ProductForm(prefix="edit")
+        context = super().get_context_data(**kwargs)
+        context['edit_form'] = ProductForm(prefix="edit")
         return context
 
     def get_success_url(self):
@@ -106,6 +107,36 @@ class ProductsView(LoginRequiredMixin, CreateView, ListView):
 
 products = ProductsView.as_view()
 
+
+@login_required
+def update_product(request):
+    if not request.method == 'POST' or not request.POST.get('pid'):
+        messages.error(request, 'Invalid Request')
+        return HttpResponseRedirect(redirect_to_referrer(request, reverse('core:products')))
+    pid = request.POST.get('pid', '')
+    product = get_object_or_404(Product, id=pid)
+    name = product.name
+    form = ProductForm(request.POST, instance=product, prefix="edit")
+    if form.is_valid():
+        form.save()
+        messages.success(request, f'{name} successfully updated.')
+    else:
+        messages.error(request, form.errors)
+    return HttpResponseRedirect(reverse('core:products'))
+
+
+@login_required
+def delete_product(request):
+    if not request.method == 'POST' or not request.POST.get('pid'):
+        messages.error(request, 'Invalid Request')
+        return HttpResponseRedirect(redirect_to_referrer(request, reverse('core:products')))
+    pid = request.POST.get('pid', '')
+    product = get_object_or_404(Product, id=pid)
+    name = product.name
+    product.delete()
+    messages.success(request, f'{name} successfully Deleted.')
+    return HttpResponseRedirect(reverse('core:products'))
+        
 
 class ProductInstanceView(LoginRequiredMixin, CreateView, ListView):
     model = ProductInstance
@@ -122,16 +153,25 @@ class ProductInstanceView(LoginRequiredMixin, CreateView, ListView):
 
     def get_context_data(self, **kwargs):
         self.object_list = self.get_queryset()
-        context = super().get_context_data(*kwargs)
-        context["edit_form"] = ProductInstanceForm(prefix="edit")
+        context = super().get_context_data(**kwargs)
         pk = self.kwargs.get('pk', '')
         product = get_object_or_404(Product, pk=pk)
+        context["edit_form"] = ProductInstanceForm(initial={'product': product}, prefix="edit")
         context['product'] = product
         return context
 
     def get_success_url(self):
+        pk = self.kwargs.get('pk', '')
+        product = get_object_or_404(Product, pk=pk)
         messages.success(self.request, "Product Instance Created successfully")
-        return reverse_lazy("core:product_instances")
+        return reverse_lazy("core:product_instances", args=[product.pk])
+    
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        pk = self.kwargs.get('pk', '')
+        product = get_object_or_404(Product, pk=pk)
+        kwargs['initial'].update({'product': product})
+        return kwargs
     
     def form_valid(self, form):
         pk = self.kwargs.get('pk', '')
@@ -139,9 +179,29 @@ class ProductInstanceView(LoginRequiredMixin, CreateView, ListView):
         form.instance.product = product
         return super().form_valid(form)
     
+    def form_invalid(self, form):
+        messages.error(self.request, form.errors)
+        return super().form_invalid(form)
+    
 product_instances = ProductInstanceView.as_view()
 
 
+@login_required
+def update_product_instance(request):
+    if not request.method == 'POST' or not request.POST.get('instance_id', ''):
+        messages.error(request, "invalid request")
+        return HttpResponseRedirect(redirect_to_referrer(request, reverse('core:products')))
+    instance_id = request.POST.get('instance_id', '')
+    instance = get_object_or_404(ProductInstance, pk=instance_id,)
+    form = ProductInstanceForm(request.POST, instance=instance, prefix='edit')
+    if form.is_valid():
+        form.save()
+        messages.success(request, 'Instance Updated successfully.')
+    else:
+        messages.error(request, form.errors)
+    return HttpResponseRedirect(reverse('core:product_instances', args=[instance.product.pk]))
+    
+    
 @login_required
 def delete_product_instance(request):
     url = redirect_to_referrer(request, reverse('core:products'))
@@ -157,5 +217,9 @@ def delete_product_instance(request):
 
 def http_500(request):
     obj = get_object_or_404(Product, name__icontains='Pro')
-    print('obj: ', obj)
     return HttpResponse(f"hello world {obj}")
+
+
+    """
+    QR CODE GENERATION 
+    """

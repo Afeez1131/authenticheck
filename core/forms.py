@@ -81,6 +81,8 @@ class ProductInstanceForm(forms.ModelForm):
     def clean(self):
         self.cleaned_data = super().clean()
         manufactured = self.cleaned_data.get("manufactured", "")
-        if manufactured and manufactured.date() != timezone.now().date():
-            self.add_error("manufactured", "Manufactured date should be the same as today.")
+        if not manufactured:
+            self.add_error('manufactured', "Manufactured field is compulsory.")
+        # if manufactured and manufactured.date() != timezone.now().date():
+        #     self.add_error("manufactured", "Manufactured date should be the same as today.")
         return self.cleaned_data

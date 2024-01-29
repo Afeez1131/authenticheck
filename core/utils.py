@@ -32,5 +32,7 @@ def top_nine_product(uid):
 def redirect_to_referrer(request, redirect_to):
     referer = request.META.get('HTTP_REFERER', '')
     if referer and referer != request.build_absolute_uri():
+        print('referer: ', referer, request.build_absolute_uri())
         return referer
+    print('redirect: ', redirect_to)
     return redirect_to

@@ -5,13 +5,25 @@
 {% endblock title %} 
 
 {% block content %}
-<main class="main-content mt-0">
-  <section>
-    <div class="page-header min-vh-100">
+
       <div class="container">
         
         <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-12">
+              <div class="row container mb-3">
+                <nav aria-label="breadcrumb">
+                  <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5">
+                    <li class="breadcrumb-item text-sm text-white">Pages</li>
+                    <li class="breadcrumb-item text-sm">
+                      <a class="text-white" href="{% url 'core:dashboard' %}">
+                        Dashboard
+                      </a>
+                    </li>
+                    <li class="opacity-5 breadcrumb-item text-sm text-white active" aria-current="page">Products</li>
+                  </ol>
+                  {% comment %} <h6 class="font-weight-bolder text-white mb-0">Dashboard</h6> {% endcomment %}
+                </nav>
+              </div>
                 <div class="card">
                 <div class="card-header pb-0 text-start">
                     <div class="d-flex align-items-center">
@@ -34,6 +46,7 @@
                                     <th>Shelf Life</th>
                                     <th>Category</th>
                                     <th>Created</th>
+                                    <th>Update</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -46,12 +59,24 @@
                                     <td>{{ product.shelf_life}} days</td>
                                     <td>{{ product.category }}</td>
                                     <td>{{ product.created }}</td>
+                                    <td><a class="btn btn-sm btn-primary"
+                                      onclick="updateModal('{{ product.pk }}', '{{ product.name }}', '{{ product.price }}', '{{ product.category }}', '{{ product.shelf_life }}', '{{ product.description }}')" 
+                                      href="" data-bs-toggle="modal" data-bs-target="#update-modal">
+                                          Update
+                                      </a>
+                                      <a class="btn btn-sm btn-danger" 
+                                        href="" data-bs-toggle="modal" data-bs-target="#delete-modal"
+                                        onclick="deleteModal('{{ product.pk }}', '{{ product.name }}')">
+                                            Delete
+                                        </a>
+                                    </td>
                                     <td>
                                         <a class="btn btn-sm btn-primary" 
                                         href="{% url 'core:product_instances' product.pk %}">
                                             Details
-                                        </a>
+                                        </a> <br>
                                     </td>
+
                                 </tr>
 
                                 {% endfor %}
@@ -64,9 +89,7 @@
             </div>
         </div>
       </div>
-    </div>
-  </section>
-</main>
+
       <div class="modal fade" id="create-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
@@ -93,7 +116,60 @@
             <button type="submit" class="btn btn-primary">Create</button>
           </div>
         </form>
+        </div>
+      </div>
+    </div>
 
+    <div class="modal fade" id="update-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+            <form role="form" method="post" action="{% url 'core:update_product' %}">
+
+          <div class="modal-header">
+            <h5 class="modal-title" id="edit-modal-title"></h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <input type="hidden" name="pid" id="pid">
+          <div class="modal-body">
+                {% csrf_token %} 
+                {% for field in edit_form %}
+                    <label for="id_{{field.name}}">
+                        {{ field.label }}
+                    </label>
+                    <div class="mb-1">
+                        {{ field }}
+                    </div>
+                {% endfor %}
+                
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Create</button>
+          </div>
+        </form>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="delete-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+            <form role="form" method="post" action="{% url 'core:delete_product' %}">
+              {% csrf_token %}
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel"></h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <input type="hidden" name='pid' id='pid'>
+          <div class="modal-body">
+               
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-danger">Delete</button>
+          </div>
+        </form>
         </div>
       </div>
     </div>
@@ -101,5 +177,24 @@
 {% block extra_script %}
 <script>
     new DataTable("#example");
+  // updateModal('{{ product.pk }}', '{{ product.name }}', '{{ product.price }}', '{{ product.category }}', '{{ product.shelf_life }}', '{{ product.description }}')" 
+    function updateModal(pk, name, price, category, shelf_life, description) {
+      $("#update-modal #edit-modal-title").html('Update Product: ' + name);
+      $("#update-modal #id_edit-name").val(name);
+      $("#update-modal #pid").val(pk);
+      $("#update-modal #id_edit-price").val(price);
+      $("#update-modal #id_edit-shelf_life").val(shelf_life);
+      $("#update-modal #id_edit-description").val(description);
+      $(`#update-modal #id_edit-category option[value="${category}"]`).prop('selected', true).trigger('change');
+    }
+
+    function deleteModal(pk, name) {
+      console.log('in here...')
+      $("#delete-modal #pid").val(pk);
+      $("#delete-modal .modal-title").html('Delete ' + name + '?');
+      $("#delete-modal .modal-body").html('Are you sure you want to delete ' + name + '?');
+
+    }
 </script>
+
 {% endblock%}

@@ -6,13 +6,30 @@
 {% endblock title %} 
 
 {% block content %}
-<main class="main-content mt-0">
-  <section>
-    <div class="page-header min-vh-100">
+
       <div class="container">
         
         <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-12">
+              <div class="row container mb-3">
+                <nav aria-label="breadcrumb">
+                  <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5">
+                    <li class="breadcrumb-item text-sm text-white">Pages</li>
+                    <li class="breadcrumb-item text-sm">
+                      <a class="text-white" href="{% url 'core:dashboard' %}">
+                        Dashboard
+                      </a>
+                    </li>
+                    <li class="breadcrumb-item text-sm">
+                      <a class="text-white" href="{% url 'core:products' %}">
+                        Products
+                      </a>
+                    </li>
+                    <li class="breadcrumb-item opacity-5 text-sm text-white active" aria-current="page">{{ product }} Instances</li>
+                  </ol>
+                  {% comment %} <h6 class="font-weight-bolder text-white mb-0">Dashboard</h6> {% endcomment %}
+                </nav>
+              </div>
                 <div class="card">
                 <div class="card-header pb-0 text-start">
                     <div class="d-flex align-items-center">
@@ -44,10 +61,11 @@
                                     <td>{{ forloop.counter }}</td>
                                     <td>{{ instance.product }}</td>
                                     <td>&#8358;{{ instance.product.price|intcomma }}</td>
-                                    <td>{{ instance.manufactured }}</td>
-                                    <td>{{ instance.expiry_date }}</td>
-                                    <td> <a class="btn btn-sm btn-primary" 
-                                      href="">
+                                    <td>{{ instance.manufactured|date:"D, M j, Y H:i:s" }}</td>
+                                    <td>{{ instance.expiry_date|date:"D, M j, Y H:i:s" }}</td>
+                                    <td> <a class="btn btn-sm btn-primary"
+                                      onclick="updateModal('{{ instance.pk }}', '{{ instance.manufactured|date:"D, M j, Y H:i:s" }}', '{{ instance }}')" 
+                                      href="" data-bs-toggle="modal" data-bs-target="#update-modal">
                                           Update
                                       </a></td>
                                     <td>
@@ -70,12 +88,10 @@
         </div>
       </div>
     </div>
-  </section>
-</main>
       <div class="modal fade" id="create-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
-            <form role="form" method="post">
+            <form role="form" method="post" id="create-form">
 
           <div class="modal-header">
             <h5 class="modal-title" id="exampleModalLabel">New Instance for {{ product }}</h5>
@@ -84,6 +100,37 @@
           <div class="modal-body">
                 {% csrf_token %} 
                 {% for field in form %}
+                    <label for="id_{{field.name}}">
+                        {{ field.label }}
+                    </label>
+                    <div class="mb-1">
+                        {{ field }}
+                    </div>
+                {% endfor %}
+                
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Create</button>
+          </div>
+        </form>
+
+        </div>
+      </div>
+    </div>
+    <div class="modal fade" id="update-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+            <form role="form" method="post" action="{% url 'core:update_product_instance' %}">
+
+          <div class="modal-header">
+            <h5 class="modal-title" id="edit-modal-title"></h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <input type="hidden" name="instance_id" id="update-instance-id">
+          <div class="modal-body">
+                {% csrf_token %} 
+                {% for field in edit_form %}
                     <label for="id_{{field.name}}">
                         {{ field.label }}
                     </label>
@@ -129,9 +176,43 @@
 {% block extra_script %}
 <script>
     new DataTable("#example");
+
+    $(document).ready(function() {
+      $("#id_product").attr('disabled', 'disabled');
+      $("#id_edit-manufactured").flatpickr({
+        enableTime: true,
+        dateFormat: "Y-m-d H:i",
+      });
+
+      $("#create-form").submit(function() {
+        $(this).find(':input').prop('disabled', false);
+      })
+    })
     function deleteModal(instance_name, instance_id){
       $("#delete-modal .modal-body").html('Are you sure you want to delete ' + instance_name);
       $("#delete-modal #iid").val(instance_id);
+    }
+
+    // #id_edit-session option[value="${sess_id}"]`).prop('selected', true).trigger('change');
+
+    function updateModal(pk, manufactured, name){
+      $("#update-modal #update-instance-id").val(pk);
+      $("#update-modal #edit-modal-title").html('Update ' + name);
+      $(`#update-modal #id_edit-product option[value="${pk}"]`).prop('selected', true).trigger('change');
+      $("#update-modal #id_edit-manufactured").val(convertToDatetimeLocal(manufactured));
+
+
+    }
+
+    function convertToDatetimeLocal(date) {
+      const dateObj = new Date(date);
+      const year = dateObj.getFullYear();
+      const month = (dateObj.getMonth() + 1).toString().padStart(2, '0');
+      const day = dateObj.getDate().toString().padStart(2, '0');
+      const hours = dateObj.getHours().toString().padStart(2, '0');
+      const minutes = dateObj.getMinutes().toString().padStart(2, '0');
+    
+      return `${year}-${month}-${day}T${hours}:${minutes}`;
     }
 </script>
 {% endblock%}

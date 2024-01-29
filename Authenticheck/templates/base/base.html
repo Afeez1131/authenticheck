@@ -46,6 +46,7 @@
     <link href="{% static 'vendor/bootstrap-select/css/bootstrap-select.css' %}" rel="stylesheet" />
     <link href="{% static 'vendor/datatable/datatables.min.css' %}" rel="stylesheet" />
     <link rel="stylesheet" type="text/css" href="{% static 'vendor/toastify/toastify.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     {% block extra_style %} {% endblock extra_style %}
   </head>
   <body class="g-sidenav-show bg-gray-100 bg-default">
@@ -55,9 +56,9 @@
     {% endblock sidebar %}
     <main class="main-content position-relative border-radius-lg ">
       <!-- Navbar -->
-      {% block top_nav %}
-        {% include "base/top_navs.html" %}
-      {% endblock top_nav %}
+      {% block top_nav %}{% include "base/top_navs.html" %}{% endblock top_nav %}
+      
+      {% comment %} {% block breadcrumb %}{% include "base/breadcrumb.html" %}{% endblock breadcrumb %} {% endcomment %}
       {% block content %}
         
       {% endblock content %}
@@ -155,6 +156,7 @@
     <script src="{% static 'vendor/bootstrap-select/js/bootstrap-select.min.js' %}"></script>
     <script src="{% static 'vendor/datatable/datatables.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'vendor/toastify/toastify.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script>
       $(document).ready(function() {
         $('.select2').selectpicker();

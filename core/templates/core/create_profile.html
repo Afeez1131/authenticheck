@@ -7,10 +7,24 @@
 {% block sidebar %} {% endblock sidebar%}
 {% block content %}
 
-    <main class="main-content mt-0">
-        <section>
-            <div class="page-header min-vh-100">
+
                 <div class="container">
+                    <div class="row container mb-3">
+                        <nav aria-label="breadcrumb">
+                          <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5">
+                            <li class="breadcrumb-item text-sm text-white">Pages</li>
+                            <li class="breadcrumb-item text-sm">
+                              <a class="text-white" href="{% url 'core:dashboard' %}">
+                                Dashboard
+                              </a>
+                            </li>
+                            <li class="breadcrumb-item opacity-5 text-sm text-white active" aria-current="page">
+                                Create Profile
+                            </li>
+                          </ol>
+                          {% comment %} <h6 class="font-weight-bolder text-white mb-0">Dashboard</h6> {% endcomment %}
+                        </nav>
+                      </div>
                     <div class="row">
                         <div class="col-lg-10 col-md-12 col-sm-12 mb-2">
                             <div class="card ">
@@ -55,7 +69,4 @@
                         </div>
                     </div>
                 </div>
-            </div>
-            </section>
-        </main>
     {% endblock content %}

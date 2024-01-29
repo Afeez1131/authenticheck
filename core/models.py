@@ -65,8 +65,7 @@ class ProductInstance(models.Model):
         return f"{self.product.name} - ({self.manufactured.date()} - {self.expiry_date.date()})"
 
     def save(self, *args, **kwargs):
-        if not self.expiry_date:
-            self.expiry_date = self.manufactured + timedelta(days=self.product.shelf_life)
+        self.expiry_date = self.manufactured + timedelta(days=self.product.shelf_life)
         return super().save(*args, **kwargs)
 
     class Meta:
