@@ -3,6 +3,8 @@ import uuid
 from datetime import timedelta, datetime
 from django.utils import timezone
 from django.contrib.auth.models import User
+
+from core.qrcode_manager import generate_secret_key
 from .enums import CategoryChoices
 
 
@@ -14,41 +16,48 @@ class Business(models.Model):
     phone = models.CharField(max_length=50)
     website = models.URLField(max_length=155)
     email = models.EmailField(max_length=155)
-    secret = models.TextField()
+    secret = models.BinaryField(null=True, blank=True, unique=True)
     created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.name} {self.email}"
+    
+    def save(self, *args, **kwargs):
+        if not self.secret:
+            self.secret = generate_secret_key()
+        return super().save(*args, **kwargs)
 
 
 class Product(models.Model):
     business = models.ForeignKey(Business, on_delete=models.CASCADE)
     name = models.CharField(max_length=155)
-    short_name = models.CharField(max_length=50, unique=True, null=True)
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     unique_code = models.UUIDField(default=uuid.uuid4, editable=False)
     shelf_life = models.PositiveIntegerField(default=0)
     category = models.CharField(max_length=50, choices=CategoryChoices.choices)
+    secret = models.BinaryField(null=True, blank=True, unique=True)
     created = models.DateTimeField(auto_now_add=True)
 
 
     def __str__(self):
-        return f"{self.name} - ({self.short_name})"
+        return f"{self.name} - ({self.price})"
 
     def save(self, *args, **kwargs):
-        if not self.short_name:
-            self.short_name = self.generate_short_name()
+        if not self.secret:
+            self.secret = generate_secret_key()
+        # if not self.short_name:
+        #     self.short_name = self.generate_short_name()
         return super().save(*args, **kwargs)
 
-    def generate_short_name(self):
-        counter = 3
-        name_parts = self.name.split(" ")
-        short_name = "-".join([part[:counter] for part in name_parts])
-        while Product.objects.filter(short_name=short_name).exists():
-            counter += 1
-            short_name = "-".join([part[:counter] for part in name_parts])
-        return short_name
+    # def generate_short_name(self):
+    #     counter = 3
+    #     name_parts = self.name.split(" ")
+    #     short_name = "-".join([part[:counter] for part in name_parts])
+    #     while Product.objects.filter(short_name=short_name).exists():
+    #         counter += 1
+    #         short_name = "-".join([part[:counter] for part in name_parts])
+    #     return short_name
 
     class Meta:
         ordering = ("-id",)
@@ -59,12 +68,15 @@ class ProductInstance(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     manufactured = models.DateTimeField()
     expiry_date = models.DateTimeField()
+    secret = models.BinaryField(null=True, blank=True, unique=True)
     created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.product.name} - ({self.manufactured.date()} - {self.expiry_date.date()})"
 
     def save(self, *args, **kwargs):
+        if not self.secret:
+            self.secret = generate_secret_key()
         self.expiry_date = self.manufactured + timedelta(days=self.product.shelf_life)
         return super().save(*args, **kwargs)
 

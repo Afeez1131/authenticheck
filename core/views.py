@@ -220,6 +220,8 @@ def http_500(request):
     return HttpResponse(f"hello world {obj}")
 
 
-    """
-    QR CODE GENERATION 
-    """
+"""
+QR CODE GENERATION 
+
+"""
+
