@@ -3,8 +3,8 @@ import uuid
 from datetime import timedelta, datetime
 from django.utils import timezone
 from django.contrib.auth.models import User
-
-from core.qrcode_manager import generate_secret_key
+from django.utils.text import slugify
+from core.qrcode_manager import QrCodeGenerator, generate_secret_key
 from .enums import CategoryChoices
 
 
@@ -28,6 +28,11 @@ class Business(models.Model):
         return super().save(*args, **kwargs)
 
 
+def product_upload_path(instance, filename):
+    name = f"{instance.name}_qr.png"
+    slg_name = slugify(instance.name)
+    return f"products/{slg_name}/qrcode/{name}"
+
 class Product(models.Model):
     business = models.ForeignKey(Business, on_delete=models.CASCADE)
     name = models.CharField(max_length=155)
@@ -37,6 +42,7 @@ class Product(models.Model):
     shelf_life = models.PositiveIntegerField(default=0)
     category = models.CharField(max_length=50, choices=CategoryChoices.choices)
     secret = models.BinaryField(null=True, blank=True, unique=True)
+    qr = models.ImageField(upload_to=product_upload_path, null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
 
 
@@ -46,21 +52,22 @@ class Product(models.Model):
     def save(self, *args, **kwargs):
         if not self.secret:
             self.secret = generate_secret_key()
-        # if not self.short_name:
-        #     self.short_name = self.generate_short_name()
+        if not self.qr:
+            manager = QrCodeGenerator(self.secret)
+            ec = manager.encode_content(self.unique_code)
+            qr = manager.generate_qr(ec)
+            self.qr = qr
         return super().save(*args, **kwargs)
-
-    # def generate_short_name(self):
-    #     counter = 3
-    #     name_parts = self.name.split(" ")
-    #     short_name = "-".join([part[:counter] for part in name_parts])
-    #     while Product.objects.filter(short_name=short_name).exists():
-    #         counter += 1
-    #         short_name = "-".join([part[:counter] for part in name_parts])
-    #     return short_name
 
     class Meta:
         ordering = ("-id",)
+
+#f"products/{slg_name}/qrcodes/{name}"
+def product_instance_upload_path(instance, filename):
+    product_name = slugify(instance.product.name)
+    count = instance.product.productinstance_set.count() + 1
+    unique_filename = f"{product_name}_instance_{count}{filename[-4:]}"
+    return f"products/{product_name}/instances/{unique_filename}"
 
 
 class ProductInstance(models.Model):
@@ -69,6 +76,7 @@ class ProductInstance(models.Model):
     manufactured = models.DateTimeField()
     expiry_date = models.DateTimeField()
     secret = models.BinaryField(null=True, blank=True, unique=True)
+    qr = models.ImageField(upload_to=product_instance_upload_path, null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -77,8 +85,18 @@ class ProductInstance(models.Model):
     def save(self, *args, **kwargs):
         if not self.secret:
             self.secret = generate_secret_key()
+        # print('ID: ', self.id, 'unique code: ', self.product.unique_code)
+        if not self.qr:
+            manager = QrCodeGenerator(self.secret)
+            data = f"{self.id}::{self.product.unique_code}"
+            encoded_data = manager.encode_content(data)
+            # print('encoded: ', encoded_data)
+            qr = manager.generate_qr(encoded_data)
+            self.qr = qr
+            # print('decoded data: ', manager.decode_content(encoded_data))
+            
         self.expiry_date = self.manufactured + timedelta(days=self.product.shelf_life)
         return super().save(*args, **kwargs)
 
     class Meta:
-        ordering = ("-id", )
+        ordering = ("-created", )
