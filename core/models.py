@@ -29,7 +29,7 @@ class Business(models.Model):
 
 
 def product_upload_path(instance, filename):
-    name = f"{instance.name}_qr.png"
+    name = f"{instance.name}_qr{filename[-4:]}"
     slg_name = slugify(instance.name)
     return f"products/{slg_name}/qrcode/{name}"
 
@@ -42,7 +42,7 @@ class Product(models.Model):
     shelf_life = models.PositiveIntegerField(default=0)
     category = models.CharField(max_length=50, choices=CategoryChoices.choices)
     secret = models.BinaryField(null=True, blank=True, unique=True)
-    qr = models.ImageField(upload_to=product_upload_path, null=True, blank=True)
+    qr = models.FileField(upload_to=product_upload_path, null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
 
 
@@ -55,7 +55,7 @@ class Product(models.Model):
         if not self.qr:
             manager = QrCodeGenerator(self.secret)
             ec = manager.encode_content(self.unique_code)
-            qr = manager.generate_qr(ec)
+            qr = manager.generate_svg(ec)
             self.qr = qr
         return super().save(*args, **kwargs)
 
@@ -66,6 +66,7 @@ class Product(models.Model):
 def product_instance_upload_path(instance, filename):
     product_name = slugify(instance.product.name)
     count = instance.product.productinstance_set.count() + 1
+    print('count: ', count)
     unique_filename = f"{product_name}_instance_{count}{filename[-4:]}"
     return f"products/{product_name}/instances/{unique_filename}"
 
@@ -76,7 +77,7 @@ class ProductInstance(models.Model):
     manufactured = models.DateTimeField()
     expiry_date = models.DateTimeField()
     secret = models.BinaryField(null=True, blank=True, unique=True)
-    qr = models.ImageField(upload_to=product_instance_upload_path, null=True, blank=True)
+    qr = models.FileField(upload_to=product_instance_upload_path, null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -91,7 +92,7 @@ class ProductInstance(models.Model):
             data = f"{self.id}::{self.product.unique_code}"
             encoded_data = manager.encode_content(data)
             # print('encoded: ', encoded_data)
-            qr = manager.generate_qr(encoded_data)
+            qr = manager.generate_svg(encoded_data)
             self.qr = qr
             # print('decoded data: ', manager.decode_content(encoded_data))
             
