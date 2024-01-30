@@ -46,8 +46,8 @@
                                     <th>Shelf Life</th>
                                     <th>Category</th>
                                     <th>Created</th>
-                                    <th>Update</th>
                                     <th>Action</th>
+                                    <th>QR</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -59,23 +59,32 @@
                                     <td>{{ product.shelf_life}} days</td>
                                     <td>{{ product.category }}</td>
                                     <td>{{ product.created }}</td>
-                                    <td><a class="btn btn-sm btn-primary"
-                                      onclick="updateModal('{{ product.pk }}', '{{ product.name }}', '{{ product.price }}', '{{ product.category }}', '{{ product.shelf_life }}', '{{ product.description }}')" 
-                                      href="" data-bs-toggle="modal" data-bs-target="#update-modal">
-                                          Update
-                                      </a>
-                                      <a class="btn btn-sm btn-danger" 
-                                        href="" data-bs-toggle="modal" data-bs-target="#delete-modal"
-                                        onclick="deleteModal('{{ product.pk }}', '{{ product.name }}')">
-                                            Delete
-                                        </a>
-                                    </td>
+                                    
                                     <td>
-                                        <a class="btn btn-sm btn-primary" 
+                                        {% comment %} <a class="btn btn-sm btn-primary" 
                                         href="{% url 'core:product_instances' product.pk %}">
                                             Details
-                                        </a> <br>
+                                        </a> <br> {% endcomment %}
+                                        <div class="dropdown">
+                                        <button class="btn btn-sm btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                          <!-- Three dots stacked on top of each other -->
+                                          <span>Actions</span>
+                                        </button>
+                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                            <li><a class="dropdown-item" 
+                                              onclick="updateModal('{{ product.pk }}', '{{ product.name }}', '{{ product.price }}', '{{ product.category }}', '{{ product.shelf_life }}', '{{ product.description }}')" 
+                                              href="" data-bs-toggle="modal" data-bs-target="#update-modal">Edit</a></li>
+                                            <li><a class="dropdown-item" href="{% url 'core:product_instances' product.pk %}">Details</a></li>
+                                            <li><a class="dropdown-item" href="" data-bs-toggle="modal" data-bs-target="#delete-modal"
+                                              onclick="deleteModal('{{ product.pk }}', '{{ product.name }}')">Delete</a></li>
+                                        </ul>
+                                      </div>
                                     </td>
+                                    <td>
+                                      <a class="btn btn-sm btn-success" href="" data-bs-toggle="modal" data-bs-target="#qr-modal"
+                                              onclick="showQr('{{ product.pk }}', '{{ product.name }}', '{{ product.qr.url }}')">Print</a>
+                                    </td>
+                                   
 
                                 </tr>
 
@@ -173,6 +182,27 @@
         </div>
       </div>
     </div>
+    <div class="modal fade" id="qr-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+            <form role="form" method="post" action="{% url 'core:download_qr' %}">
+              {% csrf_token %}
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel"></h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <input type="hidden" name="pid" id="qpid">
+          <div class="modal-body text-center">
+               <img src="" alt="" id="qr-image">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-success" data-bs-dismiss="modal">Print</button>
+          </div>
+        </form>
+        </div>
+      </div>
+    </div>
 {% endblock content %}
 {% block extra_script %}
 <script>
@@ -189,11 +219,18 @@
     }
 
     function deleteModal(pk, name) {
-      console.log('in here...')
       $("#delete-modal #pid").val(pk);
       $("#delete-modal .modal-title").html('Delete ' + name + '?');
       $("#delete-modal .modal-body").html('Are you sure you want to delete ' + name + '?');
 
+    }
+
+    function showQr(pk, name, url) {
+      console.log(pk, name, url);
+      $("#qr-modal #exampleModalLabel").html('Print QR code for ' + name);
+      $("#qr-modal #qr-image").prop('src', url);
+      $("#qr-modal #qpid").val(pk);
+      $("#qr-modal #qr-image").prop('alt', 'Qr code for '+ name);
     }
 </script>
 

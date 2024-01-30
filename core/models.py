@@ -55,7 +55,7 @@ class Product(models.Model):
         if not self.qr:
             manager = QrCodeGenerator(self.secret)
             ec = manager.encode_content(self.unique_code)
-            qr = manager.generate_svg(ec)
+            qr = manager.generate_qr(ec)
             self.qr = qr
         return super().save(*args, **kwargs)
 
@@ -66,7 +66,6 @@ class Product(models.Model):
 def product_instance_upload_path(instance, filename):
     product_name = slugify(instance.product.name)
     count = instance.product.productinstance_set.count() + 1
-    print('count: ', count)
     unique_filename = f"{product_name}_instance_{count}{filename[-4:]}"
     return f"products/{product_name}/instances/{unique_filename}"
 
@@ -86,15 +85,12 @@ class ProductInstance(models.Model):
     def save(self, *args, **kwargs):
         if not self.secret:
             self.secret = generate_secret_key()
-        # print('ID: ', self.id, 'unique code: ', self.product.unique_code)
         if not self.qr:
             manager = QrCodeGenerator(self.secret)
             data = f"{self.id}::{self.product.unique_code}"
             encoded_data = manager.encode_content(data)
-            # print('encoded: ', encoded_data)
-            qr = manager.generate_svg(encoded_data)
+            qr = manager.generate_qr(encoded_data)
             self.qr = qr
-            # print('decoded data: ', manager.decode_content(encoded_data))
             
         self.expiry_date = self.manufactured + timedelta(days=self.product.shelf_life)
         return super().save(*args, **kwargs)

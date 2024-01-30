@@ -224,4 +224,16 @@ def http_500(request):
 QR CODE GENERATION 
 
 """
-
+@login_required
+def download_qr(request):
+    if request.method != 'POST' or not request.POST.get('pid'):
+        messages.error(request, 'Invalid request')
+        return HttpResponseRedirect(reverse('core:products'))
+    pk = request.POST.get('pid', '')
+    product = get_object_or_404(Product, pk=pk)
+    qr_content = product.qr.read()
+    file_extension = product.qr.name.split(',')[-1].lower()
+    content_type = f'image/{file_extension}' if file_extension in ['png', 'svg'] else 'application/octet-stream'
+    response = HttpResponse(qr_content, content_type=content_type)
+    response['Content-Disposition'] = f'attachment; filename={product.qr.name}'
+    return response

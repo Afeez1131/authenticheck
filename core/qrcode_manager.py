@@ -9,6 +9,8 @@ from cryptography.fernet import InvalidToken
 from pyzbar.pyzbar import decode
 from PIL import Image
 
+from core.enums import FileTypeChoices
+
 def generate_secret_key():
     """
     would generate a Fernet Key
@@ -31,33 +33,20 @@ class QrCodeGenerator:
         except InvalidToken:
             return b''
     
-    def generate_qr(self, encoded_data: bytes):
-        # encoded_qr_data = self.encode_content(encoded_data)
-        url = pyqrcode.create(encoded_data, error="M")
+    def generate_qr(self, encoded_data: bytes, format=FileTypeChoices.SVG):
+        qr = pyqrcode.create(encoded_data, error="M")
         buffer = BytesIO()
-        url.png(buffer, scale=5)
+        scale = 5
+        if format == FileTypeChoices.PNG:
+            qr.png(buffer, scale=scale)
+        elif format == FileTypeChoices.SVG:
+            qr.svg(buffer, scale=scale)
+        else:
+            raise ValueError("Unsupported format") 
         buffer.seek(0)
-        
-        qr_file = ContentFile(buffer.read(), name=f"{random.randint(100, 1000)}.png")
-        return qr_file
-    
-    def generate_svg(self, encoded_data: bytes):
-        qr = pyqrcode.create(encoded_data)    
-        svg_buffer = BytesIO()    
-        qr.svg(svg_buffer, scale=5)
-        svg_buffer.seek(0)
-        qr_svg_file = ContentFile(svg_buffer.read(), name=f"{random.randint(100, 1000)}.svg")
-        return qr_svg_file
-    
-    def generate_eps(self, encoded_data: bytes):
-        qr = pyqrcode.create(encoded_data)
-        eps_buffer = BytesIO()
-        qr.eps(eps_buffer, scale=5)
-        eps_buffer.seek(0)
-        qr_eps_file = ContentFile(eps_buffer.read(), name='temp.eps')
-        return qr_eps_file
-    
-        # return url.png(f"{random.randint(200, 1000)}.png")
+        file_name = f"{random.randint(100, 1000)}.{format}"
+        file = ContentFile(buffer.read(), name=file_name)
+        return file
         
         
 def decode_barcode(image_path):

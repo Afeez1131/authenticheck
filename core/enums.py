@@ -32,3 +32,8 @@ class CategoryChoices(models.TextChoices):
     OFFICE_PRODUCTS = 'Office Products'
     MUSIC_MOVIES = 'Music & Movies'
     OTHER = 'Other'
+    
+    
+class FileTypeChoices(models.TextChoices):
+    PNG = 'png'
+    SVG = 'svg'
