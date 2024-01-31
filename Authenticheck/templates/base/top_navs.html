@@ -24,19 +24,19 @@
               <ul class="dropdown-menu dropdown-menu-end px-2 py-3 me-sm-n4" aria-labelledby="dropdownMenuButton">
                 {% if request.user.is_authenticated %}
                   <li class="mb-2">
-                    <a class="dropdown-item border-radius-md " href="{% url 'account:logout' %}">
-                      Sign Out
-                    </a>
-                  </li>
-                  <li class="mb-2">
                     <a class="dropdown-item border-radius-md" href="{% url 'core:profile' %}">
                       Profile
                     </a>
                   </li>
+                  <li class="mb-2">
+                    <a class="dropdown-item border-radius-md " href="{% url 'account:logout' %}">
+                      Sign Out
+                    </a>
+                  </li>
                 {% else %}
                 <li class="mb-2">
-                  <a class="dropdown-item border-radius-md" href="{% url 'core:profile' %}">
-                    Profile
+                  <a class="dropdown-item border-radius-md" href="{% url 'account:login' %}">
+                    Sign in
                   </a>
                 </li>
                 {% endif %}

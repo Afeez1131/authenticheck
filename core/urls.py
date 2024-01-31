@@ -5,7 +5,7 @@ from . import ajax as ajax_views
 app_name = 'core'
 
 urlpatterns = [
-    path("", views.dashboard, name="dashboard"),
+    path("dashboard", views.dashboard, name="dashboard"),
     path("create-profile", views.create_profile, name='create_profile'),
     path("profile", views.business_profile, name='profile'),
     path("products", views.products, name='products'),
