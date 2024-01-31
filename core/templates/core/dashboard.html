@@ -81,7 +81,7 @@
                     {{ instances_created_today|intcomma }}
                   </h5>
                   <p class="mb-0">
-                    <span class="text-success text-sm font-weight-bolder">{% percentage_increase_or_decrease %}%</span> than yesterday
+                    <span class="text-success text-sm font-weight-bolder">{% percentage_increase_or_decrease request.user.id %}%</span> than yesterday
                   </p>
                 </div>
               </div>
@@ -190,7 +190,7 @@
                   </td>
                   <td class="w-30">
                     <div class="ms-4">
-                      <h6 class="text-sm mb-0">{{ instance.product }}</h6>
+                      <h6 class="text-sm mb-0">{{ instance.product.name }}</h6>
                     </div>
                   </td>
                   <td>
@@ -231,12 +231,14 @@
                   </div>
                   <div class="d-flex flex-column">
                     <h6 class="mb-1 text-dark text-sm">{{ product.product.name }}</h6>
-                    <span class="text-xs">{{ product.total_count }} Instances, <span class="font-weight-bold">346+ sold</span></span>
+                    <span class="text-xs">{{ product.total_count }} Instances. 
+                      {% comment %} <span class="font-weight-bold">346+ sold</span> {% endcomment %}
+                    </span>
                   </div>
                 </div>
                 <div class="d-flex">
                   {% comment %} {% url 'core:product' product.product.pk %} {% endcomment %}
-                  <a class="btn btn-link btn-icon-only btn-rounded btn-sm text-dark icon-move-right my-auto" href=""><i class="ni ni-bold-right" aria-hidden="true"></i>
+                  <a class="btn btn-link btn-icon-only btn-rounded btn-sm text-dark icon-move-right my-auto" href="{% url 'core:product_instances' product.product.pk %}"><i class="ni ni-bold-right" aria-hidden="true"></i>
                   </a>
                 </div>
               </li>

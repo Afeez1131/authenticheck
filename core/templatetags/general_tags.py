@@ -5,15 +5,17 @@ from django.urls import reverse
 from core.models import Product, ProductInstance
 from django.template.defaultfilters import timesince
 from core.utils import to_percent
+from django.contrib.auth.models import User
 
 register = template.Library()
 
 
 @register.simple_tag
-def percentage_increase_or_decrease():
-    today_instances = ProductInstance.objects.filter(created__date=datetime.now().date()).count() or 0
+def percentage_increase_or_decrease(uid):
+    user = User.objects.get(id=uid)
+    today_instances = ProductInstance.objects.filter(product__business__user=user, created__date=datetime.now().date()).count() or 0
     yesterday = datetime.now().date() - timedelta(days=1)
-    yesterday_instances = ProductInstance.objects.filter(created__date=yesterday).count() or 0
+    yesterday_instances = ProductInstance.objects.filter(product__business__user=user,created__date=yesterday).count() or 0
     today_percent = to_percent(today_instances)
     yesterday_percent = to_percent(yesterday_instances)
     print('here: ', today_percent, yesterday_percent)

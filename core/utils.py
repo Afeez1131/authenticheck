@@ -1,6 +1,7 @@
 from .models import Product, ProductInstance
 from django.db.models import Count
 from django.contrib.auth.models import User
+import cairosvg
 import uuid
 
 
@@ -34,5 +35,20 @@ def redirect_to_referrer(request, redirect_to):
     if referer and referer != request.build_absolute_uri():
         print('referer: ', referer, request.build_absolute_uri())
         return referer
-    print('redirect: ', redirect_to)
     return redirect_to
+
+
+def svg_to_png(svg):
+    """
+    convert an svg file to png
+
+    Args:
+        svg (svg): An svg file to be converted to png
+
+    Returns:
+        _type_: png object
+    """
+    with svg.open() as file:
+        svg_content = file.read()
+    png_content = cairosvg.svg2png(bytestring=svg_content)
+    return png_content

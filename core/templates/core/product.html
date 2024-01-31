@@ -5,7 +5,7 @@
 {% endblock title %} 
 
 {% block content %}
-
+    
       <div class="container">
         
         <div class="row">
@@ -34,6 +34,7 @@
                         + New Product
                     </button>
                     </div>
+                    
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -185,7 +186,7 @@
     <div class="modal fade" id="qr-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
-            <form role="form" method="post" action="{% url 'core:download_qr' %}">
+            <form role="form" method="post" action="{% url 'core:download_qr' 'Product' %}">
               {% csrf_token %}
           <div class="modal-header">
             <h5 class="modal-title" id="exampleModalLabel"></h5>
@@ -197,17 +198,29 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-success" data-bs-dismiss="modal">Print</button>
+            <button type="submit" class="btn btn-success" data-bs-dismiss="modal">Print SVG</button>
+            <button type="button" class="btn btn-success" onclick="downloadPng();"
+            data-bs-dismiss="modal">Print PNG</button>
           </div>
         </form>
         </div>
       </div>
     </div>
+    <form method='post' action="{% url 'core:download_qr_png' 'Product' %}" id="download-png-button">
+      {% csrf_token %}
+      <input type="hidden" name="pid" id='png-id'>
+    </form>
 {% endblock content %}
 {% block extra_script %}
 <script>
     new DataTable("#example");
+
+    function downloadPng(pk) {
+      $("#png-id").val($("#qpid").val())
+      $("#download-png-button").submit();
+    }
   // updateModal('{{ product.pk }}', '{{ product.name }}', '{{ product.price }}', '{{ product.category }}', '{{ product.shelf_life }}', '{{ product.description }}')" 
+
     function updateModal(pk, name, price, category, shelf_life, description) {
       $("#update-modal #edit-modal-title").html('Update Product: ' + name);
       $("#update-modal #id_edit-name").val(name);
@@ -226,7 +239,6 @@
     }
 
     function showQr(pk, name, url) {
-      console.log(pk, name, url);
       $("#qr-modal #exampleModalLabel").html('Print QR code for ' + name);
       $("#qr-modal #qr-image").prop('src', url);
       $("#qr-modal #qpid").val(pk);

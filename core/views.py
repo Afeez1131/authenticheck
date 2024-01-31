@@ -3,7 +3,7 @@ from django.urls import reverse, reverse_lazy
 from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormView
 from django.views.generic import DetailView, TemplateView, ListView
 
-from core.utils import redirect_to_referrer, top_nine_product
+from core.utils import redirect_to_referrer, svg_to_png, top_nine_product
 from .models import Business, Product, ProductInstance
 from braces.views import LoginRequiredMixin
 from .forms import BusinessForm, ProductForm, ProductInstanceForm
@@ -13,6 +13,7 @@ from django.db.models import Count
 from django.utils.safestring import mark_safe
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect
+from django.apps import apps
 import logging
 
 logger = logging.getLogger(__name__)
@@ -225,15 +226,34 @@ QR CODE GENERATION
 
 """
 @login_required
-def download_qr(request):
+def download_qr(request, model_name):
     if request.method != 'POST' or not request.POST.get('pid'):
         messages.error(request, 'Invalid request')
         return HttpResponseRedirect(reverse('core:products'))
+    model_class = apps.get_model('core', model_name)
     pk = request.POST.get('pid', '')
-    product = get_object_or_404(Product, pk=pk)
-    qr_content = product.qr.read()
-    file_extension = product.qr.name.split(',')[-1].lower()
+    instance = get_object_or_404(model_class, pk=pk)
+    qr_content = getattr(instance, 'qr').read() #product.qr.read()
+    # file_extension = product.qr.name.split(',')[-1].lower()
+    file_extension = getattr(instance, 'qr').name.split('.')[-1].lower()
+    filename = getattr(instance, 'qr').name
     content_type = f'image/{file_extension}' if file_extension in ['png', 'svg'] else 'application/octet-stream'
     response = HttpResponse(qr_content, content_type=content_type)
-    response['Content-Disposition'] = f'attachment; filename={product.qr.name}'
+    response['Content-Disposition'] = f'attachment; filename={filename}'
+    return response
+
+
+@login_required
+def download_qr_png(request, model_name):
+    if request.method != 'POST' or not request.POST.get('pid'):
+        messages.error(request, 'Invalid request')
+        return HttpResponseRedirect(reverse('core:products'))
+    model_class = apps.get_model('core', model_name)
+    pk = request.POST.get('pid', '')
+    instance = get_object_or_404(model_class, pk=pk)
+    png_content = svg_to_png(instance.qr)
+    filename = getattr(instance, 'qr').name
+    new_name = filename.replace(filename[-3:], 'png')
+    response = HttpResponse(png_content, content_type='image/png')
+    response['Content-Disposition'] = f'attachment; filename={new_name}'
     return response

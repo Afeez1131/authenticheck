@@ -48,32 +48,49 @@
                                 <tr>
                                     <th>#</th>
                                     <th>Product</th>
-                                    <th>Price</th>
                                     <th>Manufactured</th>
                                     <th>Expiry Date</th>
-                                    <th>Created</th>
                                     <th>Action</th>
+                                    <th></th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for instance in product_instances %}
                                 <tr>
                                     <td>{{ forloop.counter }}</td>
-                                    <td>{{ instance.product }}</td>
-                                    <td>&#8358;{{ instance.product.price|intcomma }}</td>
+                                    <td>{{ instance.product.name }}</td>
                                     <td>{{ instance.manufactured|date:"D, M j, Y H:i:s" }}</td>
                                     <td>{{ instance.expiry_date|date:"D, M j, Y H:i:s" }}</td>
-                                    <td> <a class="btn btn-sm btn-primary"
+                                    {% comment %} <td> <a class="btn btn-sm btn-primary"
                                       onclick="updateModal('{{ instance.pk }}', '{{ instance.manufactured|date:"D, M j, Y H:i:s" }}', '{{ instance }}')" 
                                       href="" data-bs-toggle="modal" data-bs-target="#update-modal">
                                           Update
-                                      </a></td>
+                                      </a>
+                                    </td> {% endcomment %}
                                     <td>
-                                      <a class="btn btn-sm btn-danger" href="" 
+                                      {% comment %} <a class="btn btn-sm btn-danger" href="" 
                                       onclick="deleteModal('{{ instance }}', '{{ instance.pk}}')"
                                       data-bs-toggle="modal" data-bs-target="#delete-modal">
                                             Delete
-                                        </a>
+                                        </a> {% endcomment %}
+
+                                        <div class="dropdown">
+                                          <button class="btn btn-sm btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <!-- Three dots stacked on top of each other -->
+                                            <span>Actions</span>
+                                          </button>
+                                          <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                              <li><a class="dropdown-item" href="" 
+                                                onclick="updateModal('{{ instance.pk }}', '{{ instance.manufactured|date:"D, M j, Y H:i:s" }}', '{{ instance }}')" 
+                                              data-bs-toggle="modal" data-bs-target="#update-modal">Edit</a></li>
+                                              <li><a class="dropdown-item" href="" onclick="deleteModal('{{ instance }}', '{{ instance.pk}}')"
+                                                data-bs-toggle="modal" data-bs-target="#delete-modal">Delete</a></li>
+                                          </ul>
+                                        </div>
+                                    </td>
+                                    <td>
+                                      <a class="btn btn-sm btn-success" href="" data-bs-toggle="modal" data-bs-target="#qr-modal"
+                                              onclick="showQr('{{ instance.pk }}', '{{ instance.name }}', '{{ instance.qr.url }}')">Print</a>
                                     </td>
                                 </tr>
 
@@ -172,14 +189,49 @@
         </div>
       </div>
     </div>
+    <div class="modal fade" id="qr-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+            <form role="form" method="post" action="{% url 'core:download_qr' 'ProductInstance' %}">
+              {% csrf_token %}
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel"></h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <input type="hidden" name="pid" id="instance_id">
+          <div class="modal-body text-center">
+               <img src="" alt="" id="qr-image">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-success" data-bs-dismiss="modal">
+              Print SVG</button>
+            <button type="button" class="btn btn-primary" onclick="downloadPng();"
+            data-bs-dismiss="modal">Print PNG</button>
+          </div>
+        </form>
+        </div>
+      </div>
+    </div>
+
+    <form method='post' action="{% url 'core:download_qr_png' 'Productinstance' %}" id="download-png-button">
+      {% csrf_token %}
+      <input type="hidden" name="pid" id='png-id'>
+    </form>
+
 {% endblock content %}
 {% block extra_script %}
 <script>
     new DataTable("#example");
 
+    function downloadPng(pk) {
+      $("#png-id").val($("#instance_id").val())
+      $("#download-png-button").submit();
+    }
+
     $(document).ready(function() {
       $("#id_product").attr('disabled', 'disabled');
-      $("#id_edit-manufactured").flatpickr({
+      $("#id_manufactured, #id_edit-manufactured").flatpickr({
         enableTime: true,
         dateFormat: "Y-m-d H:i",
       });
@@ -213,6 +265,13 @@
       const minutes = dateObj.getMinutes().toString().padStart(2, '0');
     
       return `${year}-${month}-${day}T${hours}:${minutes}`;
+    }
+
+    function showQr(pk, name, url) {
+      $("#qr-modal #exampleModalLabel").html('Print QR code');
+      $("#qr-modal #qr-image").prop('src', url);
+      $("#qr-modal #instance_id").val(pk);
+      $("#qr-modal #qr-image").prop('alt', 'Qr code for '+ name);
     }
 </script>
 {% endblock%}

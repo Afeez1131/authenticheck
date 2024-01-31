@@ -15,7 +15,8 @@ urlpatterns = [
     path("update-instance", views.update_product_instance, name='update_product_instance'),
     path("delete-instance", views.delete_product_instance, name='delete_product_instance'),
     
-    path("download-qr", views.download_qr, name='download_qr'),
+    path("download-qr/<model_name>", views.download_qr, name='download_qr'),
+    path("download-qr-png/<model_name>", views.download_qr_png, name='download_qr_png'),
     
     
     # ajax
